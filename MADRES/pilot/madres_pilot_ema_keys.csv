@@ -1,0 +1,63 @@
+SurveyName,EmaName,Scale,Label,SubLabel
+Participant,,,,
+Device,,,,
+Trigger,,,,
+Trigger_counter,,,,
+Form,,,,
+Form_start_date,,,,
+Form_start_time,,,,
+Form_finish_date,,,,
+Form_finish_time,,,,
+Form_upload_date,,,,
+Form_upload_time,,,,
+Missing,,,,
+sleep_sleeptime,,,What time did you fall asleep last night? ,
+sleep_waketime,,,What time did you wake up this morning? ,
+sleep_numbertimeswake,,scaleWU,How many times did you wake up during the night? ,
+sleep_quality,,scaleWell,"Compared to a typical night over the past month, how well did you sleep last night? ",
+feeling_happy,,scale4,"Right before the phone went off, how HAPPY were you feeling?  ",
+feeling_frustrated,,scale4,"Right before the phone went off, how FRUSTRATED/ANGRYwere you feeling?  ",
+feeling_stressed,,scale4,"Right before the phone went off, how STRESSED  were you feeling?  ",
+feeling_calm,,scale4,"Right before the phone went off, how CALM/RELAXED were you feeling?  ",
+feeling_sad,,scale4,"Right before the phone went off, how SAD/DEPRESSED were you feeling?  ",
+feeling_tired,,scale4,"Right before the phone went off, how TIRED were you feeling?  ",
+feeling_energetic,,scale4,"Right before the phone went off, how ENERGETIC were you feeling?  ",
+feeling_pain,,scale4,"Right before the phone went off, how much PHYSICAL PAIN were you feeling?  ",
+feeling_nauseous,,scale4,"Right before the phone went off, how NAUSEOUS were you feeling?  ",
+perceived_stress_deal,,scale4,How certain do you feel that you can deal with all the things that you have to do RIGHT NOW?,
+perceived_stress_handle,,scale4,How confident do you feel about your ability to handle all of the demands on you RIGHT NOW?  ,
+stressful_events,,,"Since waking up this morning (Over the last 2 HOURS), has anything STRESSFUL happened to you?",
+daily_stressors_1,daily_stressors_WorkHome,,Since waking up this morning (Over the last 2 HOURS) which of these things caused you stress?,Work at home
+daily_stressors_2,daily_stressors_WorkJob,,Since waking up this morning (Over the last 2 HOURS) which of these things caused you stress?,Work at a job
+daily_stressors_3,daily_stressors_Family,,Since waking up this morning (Over the last 2 HOURS) which of these things caused you stress?,Demands made by your family
+daily_stressors_4,daily_stressors_Coworker,,Since waking up this morning (Over the last 2 HOURS) which of these things caused you stress?,Tension with a coworker
+daily_stressors_5,daily_stressors_Spouse,,Since waking up this morning (Over the last 2 HOURS) which of these things caused you stress?,Tension with your partner/ spouse
+daily_stressors_6,daily_stressors_Children,,Since waking up this morning (Over the last 2 HOURS) which of these things caused you stress?,Tension with your children
+daily_stressors_7,daily_stressors_Else,,Since waking up this morning (Over the last 2 HOURS) which of these things caused you stress?,Something else
+daily_stressors_8,daily_stressors_NoneAbove,,Since waking up this morning (Over the last 2 HOURS) which of these things caused you stress?,None of these things
+behavior_done_1,behavior_done_TV,,"Since waking up this morning (Over the last 2 HOURS), which of these things have you done?","TV, VIDEOS, or VIDEO GAMES"
+behavior_done_2,behavior_done_Sports,,"Since waking up this morning (Over the last 2 HOURS), which of these things have you done?",EXERCISE or SPORTS
+behavior_done_3,behavior_done_Fries,,"Since waking up this morning (Over the last 2 HOURS), which of these things have you done?",Eaten CHIPS or FRIES
+behavior_done_4,behavior_done_PASTRIES,,"Since waking up this morning (Over the last 2 HOURS), which of these things have you done?","Eaten PASTRIES, PAN DULCE or SWEETS"
+behavior_done_5,behavior_done_Fastfood,,"Since waking up this morning (Over the last 2 HOURS), which of these things have you done?",Eaten FAST FOOD
+behavior_done_6,behavior_done_Vegetables,,"Since waking up this morning (Over the last 2 HOURS), which of these things have you done?",Eaten FRUITS or VEGETABLES
+behavior_done_7,behavior_done_Soda,,"Since waking up this morning (Over the last 2 HOURS), which of these things have you done?",Drank SODA or ENERGY DRINKS (not counting diet drinks)  
+behavior_done_8,behavior_done_NoneAbove,,"Since waking up this morning (Over the last 2 HOURS), which of these things have you done?",None of these things
+timeuse_done_1,timeuse_done_Errands,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Errands/shopping
+timeuse_done_2,timeuse_done_ChildAct,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Took children to lessons/classes/activites
+timeuse_done_3,timeuse_done_Housework,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Housework/chores/cooking
+timeuse_done_4,timeuse_done_Job,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Work for a job
+timeuse_done_5,timeuse_done_Infant,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Took care of an infant/toddler
+timeuse_done_6,timeuse_done_NoneAbove,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",None of these
+physical_context,,scaleWhere,Where were you just before the phone went off?,
+social_context_1,social_context_Spouse,,Who were you with just before the phone went off?,Spouse or partner
+social_context_2,social_context_Children,,Who were you with just before the phone went off?,Your child(ren)
+social_context_3,social_context_OtherFamily,,Who were you with just before the phone went off?,"Other family members (for example: nephews, cousins, aunts)"
+social_context_4,social_context_Friends,,Who were you with just before the phone went off?,Friend(s)
+social_context_5,social_context_Coworkers,,Who were you with just before the phone went off?,Coworkers
+social_context_6,social_context_OtherAcq,,Who were you with just before the phone went off?,Other types of acquaintances
+social_context_7,social_context_Unknown,,Who were you with just before the phone went off?,People you don't know 
+social_context_8,social_context_Alone,,Who were you with just before the phone went off?,I was alone
+safety,,scaleSafe,How safe do you feel where you are right now?,
+Pilot.ID,,,,
+Version,,,,

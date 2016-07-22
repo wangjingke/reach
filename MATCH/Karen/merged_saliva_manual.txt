@@ -1,0 +1,2 @@
+# this file contains the manual updated saliva results, please do not change or delete it
+ordnung	uid	Label	Number	timestamp	SalivaWindow	eaten	Cortisol.nmol.l	run.Cortisol.in.duplicate

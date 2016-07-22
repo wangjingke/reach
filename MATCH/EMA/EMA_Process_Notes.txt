@@ -1,0 +1,3 @@
+11209 W3 was 11209 because the mother had to redownload the app and input her ID at home, maybe forgetting adding the wave in the end.
+
+cannot use rle to concatenate Q and A in the survey files since two Qs can be consecutive, and be ignored
