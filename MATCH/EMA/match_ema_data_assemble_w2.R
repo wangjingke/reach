@@ -1,10 +1,10 @@
 setwd("C:/Users/wangjink/Documents/REACH/MATCH/Dataset/MATCH_EMA/Wave2/Beta20160714")
 # loading functions
-source("C:/Users/wangjink/Documents/Bitbucket/reach/MATCH/EMA/backend/match_ema_functions.R")
+source("C:/Users/wangjink/Documents/GitHub/reach/MATCH/EMA/backend/match_ema_functions.R")
 # construct EMA skeletons
 # remember to update schedule sheets for ones whose startDates were not coherent with their enterDate
 library(XLConnect)
-w2 = readWorksheetFromFile("C:/Users/wangjink/Documents/Bitbucket/reach/MATCH/EMA/backend/match_ema_keys.xlsx", sheet="W2", colTypes = "character")
+w2 = readWorksheetFromFile("C:/Users/wangjink/Documents/GitHub/reach/MATCH/EMA/backend/match_ema_keys.xlsx", sheet="W2", colTypes = "character")
 w2 = w2[w2$Wave.2=="complete",]
 w2$DID = ifelse(nchar(w2$DID)<3, paste0("0", w2$DID), as.character(w2$DID))
 w2$enterDate = sapply(strsplit(ifelse(is.na(w2$ManualCorrectedEnter), w2$W2pickup, w2$ManualCorrectedEnter), " "), head, 1)

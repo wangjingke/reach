@@ -1,4 +1,4 @@
-source("C:/Users/wangjink/Documents/Bitbucket/reach/MATCH/EMA/backend/match_ema_aggregate.R")
+source("C:/Users/wangjink/Documents/GitHub/reach/MATCH/EMA/backend/match_ema_aggregate.R")
 ema.manualAggregate = function (manual, manualDir) {
     for (i in 1:length(manual)) {
         dirX = paste0(manualDir, "/", tail(strsplit(manual[i], "/")[[1]], 1))
