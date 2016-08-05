@@ -1,4 +1,4 @@
-setwd("C:/Users/wangjink/Documents/REACH/MATCH/Dataset/MATCH_EMA/Wave2/Beta20160714")
+setwd("C:/Users/wangjink/Documents/REACH/MATCH/Dataset/MATCH_EMA/Wave2/Beta20160802")
 # loading functions
 source("C:/Users/wangjink/Documents/GitHub/reach/MATCH/EMA/backend/match_ema_functions.R")
 # construct EMA skeletons
