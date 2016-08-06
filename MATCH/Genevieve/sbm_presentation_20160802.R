@@ -113,18 +113,29 @@ for (i in c("totalPhysicalActivityParenting", "totalHealthyEatingParenting", "to
 library(lme4)
 library(nlme)
 
+covariates = list()
 for (i in c("MOTHER_GOPLAY", "MOTHER_TAKEPLAY", "rMOTHER_ASKTV", "rMOTHER_LIMITTV", "MOTHER_GOFRESH", "MOTHER_COOKFRESH", "rMOTHER_ASKJUNKFOOD", "totalPhysicalActivityParenting", "totalHealthyEatingParenting")) {
     for (j in c("Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMIcat", "Age", "Childage", "HouseholdSize", "Nchildren", "TOD", "WEEKEND")) {
         lme.X = lme(eval(substitute(y ~ x, list(y = as.name(i), x = as.name(j)))), random = ~1|ID, data = sbm[!is.na(sbm[i]) & !is.na(sbm[j]),])
         print(i)
         print(j)
         print(summary(lme.X))
+        
+        if (summary(lme.X)$tTable[2, 5]<=0.06) {
+            covariates[[length(covariates)+1]] = c(i, j, summary(lme.X)$tTable[2, 5])
+        }
     }
 }
 
+# Table 4
+# checked for normality of outcomes, and no need for transformation
+bsWs = function (var, id, data) {
+    meanBS = mean(unlist(data[var]), na.rm = TRUE)
+    meanWS = mean(unlist(data[data$ID==id, var]), na.rm = TRUE)
+    result=setNames(data.frame(data[var] - meanBS, data[var] - meanWS), c("BS", "WS"))
+}
 
-
-
+for (i in c(""))
 
 
 
