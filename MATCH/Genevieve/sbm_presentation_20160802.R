@@ -59,10 +59,48 @@ sbm$zTotalStressors = zScore(sbm$totalStressors)
 
 sbm$totalStress = sbm$zMOTHER_STRESSED + sbm$zTotalPerceivedStress + sbm$zTotalStressors
 
+# recode the 1P1 parenting variables
+sbm$rMOTHER_ASKTV_1P1 = sapply(as.numeric(sbm$MOTHER_ASKTV_1P1), recode, c(0, 1, 2, 3, 4), c(0, 0, 1, 0, NA))
+sbm$rMOTHER_LIMITTV_1P1 = sapply(as.numeric(sbm$MOTHER_LIMITTV_1P1), recode, c(0, 1), c(0, 0.5))
+sbm$rMOTHER_LIMITTV_1P1 = ifelse(!is.na(sbm$MOTHER_ASKTV_1P1) & is.na(sbm$MOTHER_LIMITTV_1P1), 0, sbm$rMOTHER_LIMITTV_1P1)
+
+sbm$rMOTHER_ASKJUNKFOOD_1P1 = sapply(as.numeric(sbm$MOTHER_ASKJUNKFOOD_1P1), recode, c(0, 1, 2, 3, 4), c(0, 0, 1, 0, NA))
+sbm$rMOTHER_LIMITJUNKFOOD_1P1 = sapply(as.numeric(sbm$MOTHER_LIMITJUNKFOOD_1P1), recode, c(0, 1), c(0, 0.5))
+sbm$rMOTHER_LIMITJUNKFOOD_1P1 = ifelse(!is.na(sbm$MOTHER_ASKJUNKFOOD_1P1) & is.na(sbm$MOTHER_LIMITJUNKFOOD_1P1), 0, sbm$rMOTHER_LIMITJUNKFOOD_1P1)
+
+sbm$totalPhysicalActivityParenting_1P1 = sbm$MOTHER_GOPLAY_1P1 + sbm$MOTHER_TAKEPLAY_1P1 + sbm$rMOTHER_ASKTV_1P1 + sbm$rMOTHER_LIMITTV_1P1
+sbm$totalHealthyEatingParenting_1P1 = sbm$MOTHER_GOFRESH_1P1 + sbm$MOTHER_COOKFRESH_1P1 + sbm$rMOTHER_ASKJUNKFOOD_1P1 + sbm$rMOTHER_LIMITJUNKFOOD_1P1
+
+# creating BS/WS variables
+bsWs = function (var, data) {
+    data$BS = NA
+    data$WS = NA 
+    for (i in 1:nrow(data)) {
+        data[i, "BS"] = data[i, var] - mean(unlist(data[var]), na.rm = TRUE)
+        data[i, "WS"] = data[i, var] - mean(unlist(data[data$ID==data$ID[i], var]), na.rm = TRUE)
+    }
+    return(data)
+}
+
+predictors = c("totalPerceivedStress", "totalStress", "totalStressors", "rMOTHER_STRESS_HOMEWK", "rMOTHER_STRESS_JOB", "rMOTHER_STRESS_DEMANDS", "rMOTHER_STRESS_COWRKR", "rMOTHER_STRESS_SPOUSE", "rMOTHER_STRESS_CHILD", "rMOTHER_STRESS_ELSE")
+for (i in predictors) {
+    for (j in 1:nrow(sbm)) {
+        sbm[j, paste0(i, "_BS")] = sbm[j, i] - mean(unlist(sbm[i]), na.rm = TRUE)
+        sbm[j, paste0(i, "_WS")] = sbm[j, i] - mean(unlist(sbm[sbm$ID==sbm$ID[j], i]), na.rm = TRUE)
+    }
+    print(i)
+}
+
+
 # exclusions
-sbm = sbm[!is.na(sbm$MOTHER_WITHCHILD) & as.numeric(sbm$MOTHER_WITHCHILD)==2, ]
-few = aggregate(WINDOW_MOTHER~ID, data = sbm, length)
-sbm = sbm[sbm$ID %in% few$ID[few$WINDOW_MOTHER>3],]
+sbmMain = sbm[!is.na(sbm$MOTHER_WITHCHILD) & as.numeric(sbm$MOTHER_WITHCHILD)==2, ]
+fewMain = aggregate(WINDOW_MOTHER~ID, data = sbmMain, length)
+sbmMain = sbmMain[sbmMain$ID %in% fewMain$ID[fewMain$WINDOW_MOTHER>3],]
+
+sbmAnc = sbm[!is.na(sbm$MOTHER_WITHCHILD_1P1) & as.numeric(sbm$MOTHER_WITHCHILD_1P1)==1, ]
+fewAnc = aggregate(WINDOW_MOTHER~ID, data = sbmAnc, length)
+sbmAnc = sbmAnc[sbmAnc$ID %in% fewAnc$ID[fewAnc$WINDOW_MOTHER>3],]
+
 
 # function to report summary statitics
 sumContinuous = function(x) {
@@ -74,39 +112,75 @@ sumCategory = function(x) {
     print(prop.table(table(x, useNA = "ifany"))*100)
 }
 
-# Table 1 demographics
-demographics = unique(sbm[c("ID", "Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Age", "Childage", "HouseholdSize", "Nchildren", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMI", "mBMIcat")])
+# Table 1 demographics (MAIN)
+demographicsMain = unique(sbmMain[c("ID", "Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Age", "Childage", "HouseholdSize", "Nchildren", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMI", "mBMIcat")])
 varCat = c("Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMIcat")
 varCon = c("Age", "Childage", "HouseholdSize", "Nchildren")
 # categorical demographic variable summary
 for (i in varCat) {
     print(i)
-    sumCategory(demographics[i])
+    sumCategory(demographicsMain[i])
 }
 # continuous demographic variable summary
 for (i in varCon) {
     print(i)
-    sumContinuous(unlist(demographics[i]))
+    sumContinuous(unlist(demographicsMain[i]))
 }
 
-# Table 2 descriptive statistics
+# Table 2 descriptive statistics (MAIN)
 # number of mothers
-length(unique(demographics$ID))
+length(unique(demographicsMain$ID))
 # number of total prompts
-nrow(sbm)
+nrow(sbmMain)
 # average number of prompts per mother
-sumContinuous(aggregate(WINDOW~ID, data = sbm, length)$WINDOW)
+sumContinuous(aggregate(WINDOW~ID, data = sbmMain, length)$WINDOW)
 # mother ema compliance rate
-sumContinuous(aggregate(COMPLY~ID, data = sbm, mean)$COMPLY)
+sumContinuous(aggregate(COMPLY~ID, data = sbmMain, mean)$COMPLY)
 
 for (i in c("rMOTHER_LIMITJUNKFOOD", "rMOTHER_STRESS_HOMEWK", "rMOTHER_STRESS_JOB", "rMOTHER_STRESS_DEMANDS", "rMOTHER_STRESS_COWRKR", "rMOTHER_STRESS_SPOUSE", "rMOTHER_STRESS_CHILD", "rMOTHER_STRESS_ELSE", "MOTHER_GOPLAY", "MOTHER_TAKEPLAY", "rMOTHER_ASKTV", "rMOTHER_LIMITTV", "MOTHER_GOFRESH", "MOTHER_COOKFRESH", "rMOTHER_ASKJUNKFOOD")) {
     print(i)
-    sumCategory(sbm[i])
+    sumCategory(sbmMain[i])
 }
 
 for (i in c("totalPhysicalActivityParenting", "totalHealthyEatingParenting", "totalPerceivedStress", "totalStressors", "zMOTHER_STRESSED", "zTotalPerceivedStress", "zTotalStressors", "totalStress")) {
     print(i)
-    sumContinuous(unlist(sbm[i]))
+    sumContinuous(unlist(sbmMain[i]))
+}
+
+
+# Table 1 demographics (Ancillary)
+demographicsAnc = unique(sbmAnc[c("ID", "Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Age", "Childage", "HouseholdSize", "Nchildren", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMI", "mBMIcat")])
+varCat = c("Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMIcat")
+varCon = c("Age", "Childage", "HouseholdSize", "Nchildren")
+# categorical demographic variable summary
+for (i in varCat) {
+    print(i)
+    sumCategory(demographicsAnc[i])
+}
+# continuous demographic variable summary
+for (i in varCon) {
+    print(i)
+    sumContinuous(unlist(demographicsAnc[i]))
+}
+
+# Table 2 descriptive statistics (Ancillary)
+# number of mothers
+length(unique(demographicsAnc$ID))
+# number of total prompts
+nrow(sbmAnc)
+# average number of prompts per mother
+sumContinuous(aggregate(WINDOW~ID, data = sbmAnc, length)$WINDOW)
+# mother ema compliance rate
+sumContinuous(aggregate(COMPLY~ID, data = sbmAnc, mean)$COMPLY)
+
+for (i in c("rMOTHER_LIMITJUNKFOOD", "rMOTHER_STRESS_HOMEWK", "rMOTHER_STRESS_JOB", "rMOTHER_STRESS_DEMANDS", "rMOTHER_STRESS_COWRKR", "rMOTHER_STRESS_SPOUSE", "rMOTHER_STRESS_CHILD", "rMOTHER_STRESS_ELSE", "MOTHER_GOPLAY", "MOTHER_TAKEPLAY", "rMOTHER_ASKTV", "rMOTHER_LIMITTV", "MOTHER_GOFRESH", "MOTHER_COOKFRESH", "rMOTHER_ASKJUNKFOOD")) {
+    print(i)
+    sumCategory(sbmAnc[i])
+}
+
+for (i in c("totalPhysicalActivityParenting", "totalHealthyEatingParenting", "totalPerceivedStress", "totalStressors", "zMOTHER_STRESSED", "zTotalPerceivedStress", "zTotalStressors", "totalStress")) {
+    print(i)
+    sumContinuous(unlist(sbmAnc[i]))
 }
 
 # Table 3 covariate screening
@@ -127,35 +201,34 @@ for (i in c("MOTHER_GOPLAY", "MOTHER_TAKEPLAY", "rMOTHER_ASKTV", "rMOTHER_LIMITT
     }
 }
 
-# Table 4
-# checked for normality of outcomes, and no need for transformation
-bsWs = function (var, id, data) {
-    meanBS = mean(unlist(data[var]), na.rm = TRUE)
-    meanWS = mean(unlist(data[data$ID==id, var]), na.rm = TRUE)
-    result=setNames(data.frame(data[var] - meanBS, data[var] - meanWS), c("BS", "WS"))
-}
-
-for (i in c(""))
+write.dta(sbmMain, "sbm_20160808_main.dta")
+write.dta(sbmAnc, "sbm_20160808_ancillary.dta")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# # Table 4
+# # checked for normality of outcomes, and no need for transformation
+# for (i in c("totalPhysicalActivityParenting", "totalHealthyEatingParenting")) {
+#     for (j in c("totalPerceivedStress", "totalStressors", "totalStress")) {
+#         dataX = sbmMain[!is.na(sbmMain[i]) & !is.na(sbmMain[j]) & !is.na(sbmMain$Bi_college) & !is.na(sbmMain$Nchildren) & !is.na(sbmMain$TOD) & !is.na(sbmMain$Bi_CC_Fred) & !is.na(sbmMain$Hispanic) & !is.na(sbmMain$cHispanic) & !is.na(sbmMain$HouseholdSize) & !is.na(sbmMain$Child_Gender) & !is.na(sbmMain$Age) & !is.na(sbmMain$WEEKEND) & !is.na(sbmMain$Bi_Fulltime) & !is.na(sbmMain$Childage) & !is.na(sbmMain$Bi_BornUS),]
+#         dataX = bsWs(j, dataX)
+# 
+#         lme.X = lme(eval(substitute(y ~ BS+WS+Bi_college+Nchildren+TOD+Bi_CC_Fred+Hispanic+cHispanic+HouseholdSize+Child_Gender+Age+WEEKEND+Bi_Fulltime+Childage+Bi_BornUS, list(y = as.name(i)))), random = ~1|ID, data = dataX)
+#         print(i)
+#         print(j)
+#         print(summary(lme.X))
+#     }
+# }
+# 
+# # Table 5
+# for (i in c("totalPhysicalActivityParenting", "totalHealthyEatingParenting")) {
+#     for (j in c("rMOTHER_STRESS_HOMEWK", "rMOTHER_STRESS_JOB", "rMOTHER_STRESS_DEMANDS", "rMOTHER_STRESS_COWRKR", "rMOTHER_STRESS_SPOUSE")) {
+#         dataX = sbmMain[!is.na(sbmMain[i]) & !is.na(sbmMain[j]) & !is.na(sbmMain$Bi_college) & !is.na(sbmMain$Nchildren) & !is.na(sbmMain$TOD) & !is.na(sbmMain$Bi_CC_Fred) & !is.na(sbmMain$Hispanic) & !is.na(sbmMain$cHispanic) & !is.na(sbmMain$HouseholdSize) & !is.na(sbmMain$Child_Gender) & !is.na(sbmMain$Age) & !is.na(sbmMain$WEEKEND) & !is.na(sbmMain$Bi_Fulltime) & !is.na(sbmMain$Childage) & !is.na(sbm$Bi_BornUS),]
+#         dataX = bsWs(j, dataX)
+# 
+#         lme.X = lme(eval(substitute(y ~ BS+WS+Bi_college+Nchildren+TOD+Bi_CC_Fred+Hispanic+cHispanic+HouseholdSize+Child_Gender+Age+WEEKEND+Bi_Fulltime+Childage+Bi_BornUS, list(y = as.name(i)))), random = ~1|ID, data = dataX)
+#         print(i)
+#         print(j)
+#         print(summary(lme.X))
+#     }
+# }
 
