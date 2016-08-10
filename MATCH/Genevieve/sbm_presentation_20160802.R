@@ -91,15 +91,10 @@ for (i in predictors) {
     print(i)
 }
 
-
 # exclusions
 sbmMain = sbm[!is.na(sbm$MOTHER_WITHCHILD) & as.numeric(sbm$MOTHER_WITHCHILD)==2, ]
 fewMain = aggregate(WINDOW_MOTHER~ID, data = sbmMain, length)
 sbmMain = sbmMain[sbmMain$ID %in% fewMain$ID[fewMain$WINDOW_MOTHER>3],]
-
-sbmAnc = sbm[!is.na(sbm$MOTHER_WITHCHILD_1P1) & as.numeric(sbm$MOTHER_WITHCHILD_1P1)==1, ]
-fewAnc = aggregate(WINDOW_MOTHER~ID, data = sbmAnc, length)
-sbmAnc = sbmAnc[sbmAnc$ID %in% fewAnc$ID[fewAnc$WINDOW_MOTHER>3],]
 
 
 # function to report summary statitics
@@ -115,7 +110,7 @@ sumCategory = function(x) {
 # Table 1 demographics (MAIN)
 demographicsMain = unique(sbmMain[c("ID", "Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Age", "Childage", "HouseholdSize", "Nchildren", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMI", "mBMIcat")])
 varCat = c("Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMIcat")
-varCon = c("Age", "Childage", "HouseholdSize", "Nchildren")
+varCon = c("Age", "Childage", "HouseholdSize", "Nchildren", "mBMI")
 # categorical demographic variable summary
 for (i in varCat) {
     print(i)
@@ -137,21 +132,29 @@ sumContinuous(aggregate(WINDOW~ID, data = sbmMain, length)$WINDOW)
 # mother ema compliance rate
 sumContinuous(aggregate(COMPLY~ID, data = sbmMain, mean)$COMPLY)
 
-for (i in c("rMOTHER_LIMITJUNKFOOD", "rMOTHER_STRESS_HOMEWK", "rMOTHER_STRESS_JOB", "rMOTHER_STRESS_DEMANDS", "rMOTHER_STRESS_COWRKR", "rMOTHER_STRESS_SPOUSE", "rMOTHER_STRESS_CHILD", "rMOTHER_STRESS_ELSE", "MOTHER_GOPLAY", "MOTHER_TAKEPLAY", "rMOTHER_ASKTV", "rMOTHER_LIMITTV", "MOTHER_GOFRESH", "MOTHER_COOKFRESH", "rMOTHER_ASKJUNKFOOD")) {
+for (i in c("rMOTHER_STRESS_HOMEWK", "rMOTHER_STRESS_JOB", "rMOTHER_STRESS_DEMANDS", "rMOTHER_STRESS_COWRKR", "rMOTHER_STRESS_SPOUSE", "rMOTHER_STRESS_CHILD", "rMOTHER_STRESS_ELSE", "MOTHER_GOPLAY", "MOTHER_TAKEPLAY", "rMOTHER_ASKTV", "rMOTHER_LIMITTV", "MOTHER_GOFRESH", "MOTHER_COOKFRESH", "rMOTHER_ASKJUNKFOOD", "rMOTHER_LIMITJUNKFOOD", "rMOTHER_DEAL", "rMOTHER_HANDLE")) {
     print(i)
     sumCategory(sbmMain[i])
 }
 
-for (i in c("totalPhysicalActivityParenting", "totalHealthyEatingParenting", "totalPerceivedStress", "totalStressors", "zMOTHER_STRESSED", "zTotalPerceivedStress", "zTotalStressors", "totalStress")) {
+for (i in c("totalPhysicalActivityParenting", "totalHealthyEatingParenting", "totalPerceivedStress", "totalStressors", "totalStress")) {
     print(i)
     sumContinuous(unlist(sbmMain[i]))
 }
+# cronbach's alpha
+library(psych)
+alpha(sbmMain[c("totalPerceivedStress", "rMOTHER_DEAL", "rMOTHER_HANDLE")])
+alpha(sbmMain[c("zMOTHER_STRESSED", "zTotalPerceivedStress", "zTotalStressors")])
 
+### Ancillary, exclusion ###
+sbmAnc = sbm[!is.na(sbm$MOTHER_WITHCHILD_1P1) & as.numeric(sbm$MOTHER_WITHCHILD_1P1)==1, ]
+fewAnc = aggregate(WINDOW_MOTHER~ID, data = sbmAnc, length)
+sbmAnc = sbmAnc[sbmAnc$ID %in% fewAnc$ID[fewAnc$WINDOW_MOTHER>3],]
 
 # Table 1 demographics (Ancillary)
 demographicsAnc = unique(sbmAnc[c("ID", "Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Age", "Childage", "HouseholdSize", "Nchildren", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMI", "mBMIcat")])
 varCat = c("Bi_BornUS", "Bi_CC_Fred", "CC_Grandparent", "CC_program", "Bi_singleparent", "Bi_married", "Bi_college", "Hispanic", "cHispanic", "incomeQ", "Bi_Fulltime", "Bi_Work", "Child_Gender", "mBMIcat")
-varCon = c("Age", "Childage", "HouseholdSize", "Nchildren")
+varCon = c("Age", "Childage", "HouseholdSize", "Nchildren", "mBMI")
 # categorical demographic variable summary
 for (i in varCat) {
     print(i)
@@ -173,7 +176,7 @@ sumContinuous(aggregate(WINDOW~ID, data = sbmAnc, length)$WINDOW)
 # mother ema compliance rate
 sumContinuous(aggregate(COMPLY~ID, data = sbmAnc, mean)$COMPLY)
 
-for (i in c("rMOTHER_LIMITJUNKFOOD", "rMOTHER_STRESS_HOMEWK", "rMOTHER_STRESS_JOB", "rMOTHER_STRESS_DEMANDS", "rMOTHER_STRESS_COWRKR", "rMOTHER_STRESS_SPOUSE", "rMOTHER_STRESS_CHILD", "rMOTHER_STRESS_ELSE", "MOTHER_GOPLAY", "MOTHER_TAKEPLAY", "rMOTHER_ASKTV", "rMOTHER_LIMITTV", "MOTHER_GOFRESH", "MOTHER_COOKFRESH", "rMOTHER_ASKJUNKFOOD")) {
+for (i in c("rMOTHER_STRESS_HOMEWK", "rMOTHER_STRESS_JOB", "rMOTHER_STRESS_DEMANDS", "rMOTHER_STRESS_COWRKR", "rMOTHER_STRESS_SPOUSE", "rMOTHER_STRESS_CHILD", "rMOTHER_STRESS_ELSE", "MOTHER_GOPLAY", "MOTHER_TAKEPLAY", "rMOTHER_ASKTV", "rMOTHER_LIMITTV", "MOTHER_GOFRESH", "MOTHER_COOKFRESH", "rMOTHER_ASKJUNKFOOD", "rMOTHER_LIMITJUNKFOOD")) {
     print(i)
     sumCategory(sbmAnc[i])
 }
@@ -182,6 +185,10 @@ for (i in c("totalPhysicalActivityParenting", "totalHealthyEatingParenting", "to
     print(i)
     sumContinuous(unlist(sbmAnc[i]))
 }
+
+library(psych)
+alpha(sbmAnc[c("totalPerceivedStress", "rMOTHER_DEAL", "rMOTHER_HANDLE")])
+alpha(sbmAnc[c("zMOTHER_STRESSED", "zTotalPerceivedStress", "zTotalStressors")])
 
 # Table 3 covariate screening
 library(lme4)
