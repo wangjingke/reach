@@ -32,14 +32,14 @@ for (i in 1:nrow(archive)) {
     inStudyByFolder = archive$date[i]>=w1$W1pickup[which(w1$DID==archive$folderDID[i])] & archive$date[i]<=w1$W1dropoff[which(w1$DID==archive$folderDID[i])]
     archive$inStudyByFolder[i] = if(length(inStudyByFolder)>0) inStudyByFolder else NA
     rm(inStudyByFolder)
-    
+
     inStudyByID = archive$date[i]>=w1$W1pickup[which(w1$DID==archive$subDID[i])] & archive$date[i]<=w1$W1dropoff[which(w1$DID==archive$subDID[i])]
     # archive$inStudyByID[i] = if(length(inStudyByID)>0) inStudyByID else NA
     if (isTRUE(inStudyByID)) {
         idX = tail(strsplit(archive$subjectID[i], "_")[[1]], 1)
         posX = which(archive$subjectID==idX & archive$correctFolder == TRUE & archive$date == archive$date[i])
         if (length(posX)>0) {
-            archive$inStudyByID[i] = FALSE # not unique 
+            archive$inStudyByID[i] = FALSE # not unique
         } else {
             archive$inStudyByID[i] = TRUE # unique existence in other folder
         }
@@ -51,3 +51,35 @@ for (i in 1:nrow(archive)) {
 
 scenario1 = archive[archive$inStudyByFolder==TRUE & !is.na(archive$inStudyByFolder) & archive$correctFolder==FALSE,] # correct folder, wrong ID
 scenario2 = archive[archive$inStudyByID==TRUE & !is.na(archive$inStudyByID),] # correct ID, wrong folder
+# 11063 mislabeled as 12063, use folder name as ID
+# 11103 mislabeled as 11100, use folder name as ID
+# 11120 mislabeled as 12120, use folder name as ID
+# 12064 and 12066 switched phone in the middle of their study
+# 12162 mislabeled as 12163, use folder name as ID
+# 11096 was in 11113
+# partial 11115 was in 11121
+# 11114 was in 11123
+# 11112 was in 11125
+# 11129 was in 11132
+# 11144 was in 11163
+# 11141 was in 11170
+# 11156 was in 11182
+# 11126 was in 11200
+# 11151 was in 11200
+# 11168 was in 11200
+# 11193 was in 12000
+# 11147 was in 11210
+# 11160 was in 11210
+# 11190 was in 11210
+# 11184 was in 11218
+# 11206 was in 11218
+# 12033 was in 12030
+# 12112 was in 12127
+# 12129 was in 12132
+# 12149 was in 12162
+# 12148 was in 12172
+# 12168 was in 12181
+# 12119 was in 12201
+# 12160 was in 12210
+# 12190 was in 12210
+# 12162 mislabled as 12163, use folder name as ID
