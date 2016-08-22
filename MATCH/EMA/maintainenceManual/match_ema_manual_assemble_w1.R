@@ -13,7 +13,7 @@ library(XLConnect)
 w1 = readWorksheetFromFile("C:/Users/wangjink/Documents/GitHub/reach/MATCH/EMA/backend/match_ema_keys.xlsx", sheet="W1")
 w1$DID=ifelse(nchar(w1$DID)<3, paste0("0", w1$DID), as.character(w1$DID))
 
-archive  = read.csv("C:/Users/wangjink/Documents/REACH/MATCH/EMA_ManualRetrieve/W1/MATCH_EMA_List_Manual_2016-08-17.csv", header = TRUE, stringsAsFactors = FALSE)
+archive  = read.csv("C:/Users/wangjink/Documents/REACH/MATCH/EMA_ManualRetrieve/W1/MATCH_EMA_List_Manual_2016-08-22.csv", header = TRUE, stringsAsFactors = FALSE)
 
 # scenario 1, corret folder, wrong subjectID
 archive$folderDID  = substring(archive$folder, 3, 5)
@@ -83,3 +83,14 @@ scenario2 = archive[archive$inStudyByID==TRUE & !is.na(archive$inStudyByID),] # 
 # 12160 was in 12210
 # 12190 was in 12210
 # 12162 mislabled as 12163, use folder name as ID
+
+# after cleaning, redo assemble
+manual = list.dirs("Y:/MATCH STUDY/Main Study/Data/Manual Uploads/Phone EMA Manual Back-up/Wave 1", recursive = FALSE)
+ema.manualAggregate(manual, manualDir = work_dir)
+# after changing the folder names, redo archive
+write.csv(ema.archive(work_dir, folder = 1), paste0("MATCH_EMA_List_Manual_", Sys.Date(), ".csv"), row.names = FALSE, quote = FALSE)
+
+
+
+
+
