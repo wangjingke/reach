@@ -1,10 +1,10 @@
-setwd("C:/Users/wangjink/Documents/REACH/MATCH/Dataset/MATCH_EMA/Wave2/Beta20160802")
+setwd("D:/REACH/MATCH/Dataset/MATCH_EMA/Wave2/Beta20160829")
 # loading functions
-source("C:/Users/wangjink/Documents/GitHub/reach/MATCH/EMA/backend/match_ema_functions.R")
+source("D:/GitHub/reach/MATCH/EMA/backend/match_ema_functions.R")
 # construct EMA skeletons
 # remember to update schedule sheets for ones whose startDates were not coherent with their enterDate
 library(XLConnect)
-w2 = readWorksheetFromFile("C:/Users/wangjink/Documents/GitHub/reach/MATCH/EMA/backend/match_ema_keys.xlsx", sheet="W2", colTypes = "character")
+w2 = readWorksheetFromFile("D:/GitHub/reach/MATCH/EMA/backend/match_ema_keys.xlsx", sheet="W2", colTypes = "character")
 w2 = w2[w2$Wave.2=="complete",]
 w2$DID = ifelse(nchar(w2$DID)<3, paste0("0", w2$DID), as.character(w2$DID))
 w2$enterDate = sapply(strsplit(ifelse(is.na(w2$ManualCorrectedEnter), w2$W2pickup, w2$ManualCorrectedEnter), " "), head, 1)
@@ -12,7 +12,7 @@ w2$mother = paste0("11", w2$DID)
 w2$child = paste0("12", w2$DID)
 
 W2EMA=ema.promptList(w2, start = "enterDate")
-W2EMA=ema.fetchPrompt(ema=W2EMA, emaList="MATCH_EMA_List_Clean_2016-07-14.csv", emaDir="C:/Users/wangjink/Documents/REACH/MATCH/EMA_Clean_RDS/W2", warning="MATCH_W2_warnings.txt")
+W2EMA=ema.fetchPrompt(ema=W2EMA, emaList="MATCH_EMA_List_Clean_2016-08-24.csv", emaDir="D:/REACH/MATCH/EMA_Clean_RDS/W2", warning="MATCH_W2_warnings.txt")
 
 # search for low compliance
 compliance = ema.compliance(W2EMA)
@@ -34,7 +34,7 @@ W2EMA=ema.factor(W2EMA)
 # integrating ACC data
 W2EMA=ema.attachACC(W2EMA)
 W2EMA=ema.attachACC(W2EMA, prefix = "O")
-W2EMA=ema.ACC(ema=W2EMA, missing_output=paste0("MATCH_EMA_ACC_Missing_", Sys.Date(), ".csv"), accDir = "C:/Users/wangjink/Documents/REACH/MATCH/ACC", accList="MATCH_ACC_List_2016-07-14.csv")
+W2EMA=ema.ACC(ema=W2EMA, missing_output=paste0("MATCH_EMA_ACC_Missing_", Sys.Date(), ".csv"), accDir = "D:/REACH/MATCH/ACC", accList="MATCH_ACC_List_2016-08-29.csv")
 
 # save the unanchored set
 saveRDS(W2EMA, paste0("MATCH_EMA_W2_preanchored_", Sys.Date(), ".rds"))
@@ -57,7 +57,7 @@ stopCluster(cl)
 saveRDS(W2EMA_anchored, paste0("MATCH_EMA_W2_anchored_", Sys.Date(), ".rds"))
 
 # adding daily average physical activity
-matchW2=ema.dailyPA(W2EMA_anchored, AccSummary="C:/Users/wangjink/Documents/REACH/MATCH/ACC/MATCH_ACC_Summary_2016-07-14.txt")
+matchW2=ema.dailyPA(W2EMA_anchored, AccSummary="D:/REACH/MATCH/ACC/MATCH_ACC_Summary_2016-08-29.txt")
 saveRDS(matchW2, paste0("MATCH_EMA_W2_", Sys.Date(), ".rds"))
 
 # create STATA script to label variables

@@ -67,7 +67,7 @@ ema.attachACC=function(ema, prefix = "") {
 ema.extractACC = function(timepoint, accX) {
     # function to subset by time, and aggregate MVPA (fork from common)
     ema.mvpa = function(accX, start, end) {
-        skeleton = data.frame(MVPA = c("light", "moderate", "nonwear", "sedentary", "vigorous"))
+        skeleton = data.frame(MVPA = c("light", "moderate", "nonvalid", "sedentary", "vigorous"))
         accX.seq = accX$data[accX$data$stamp > start & accX$data$stamp <= end, ]
         mvpa = aggregate(min ~ MVPA, data = accX.seq, sum, na.rm = TRUE)
         result = merge(skeleton, mvpa, by = "MVPA", all.x = TRUE, sort = FALSE)
@@ -75,7 +75,7 @@ ema.extractACC = function(timepoint, accX) {
         return(result)
     }
     MVPA=rbind(
-        category=c("nonwear", "sedentary", "light", "moderate", "vigorous"),
+        category=c("nonvalid", "sedentary", "light", "moderate", "vigorous"),
         var=c("NONVALID", "SED", "LIGHT", "MOD", "VIG")
     )
 
@@ -104,6 +104,7 @@ ema.extractACC = function(timepoint, accX) {
                 output[1, paste0(type, "_", k, "_AFTER")]=mvpaX[m, "min"]
             }
         }
+        # around prompt
         for (k in c(15, 30, 60, 120)) {
             output[1, paste0("VALID_", k, "_BEFORE")]=k-output[1, paste0("NONVALID_", k, "_BEFORE")]
             output[1, paste0("MVPA_", k, "_BEFORE")]=output[1, paste0("MOD_", k, "_BEFORE")]+output[1, paste0("VIG_", k, "_BEFORE")]

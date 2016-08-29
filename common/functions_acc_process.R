@@ -33,7 +33,7 @@ troiano = data.frame(
 )
 
 # function of reading ACC files
-acc.read = function(fileX, epoch = 60, ...) {
+acc.read = function(fileX, epoch = 30, ...) {
     # reading header
     header = read.csv(fileX, nrow = 10, header = FALSE, stringsAsFactors = FALSE)
     serial = strsplit(header[2, 1], " ")[[1]][3]
@@ -66,7 +66,7 @@ acc.read = function(fileX, epoch = 60, ...) {
 }
 
 # function of reading ACC files using the DataTable file
-acc.read.DT = function(fileX, epoch = 60, ...) {
+acc.read.DT = function(fileX, epoch = 30, ...) {
     # reading header
     header = read.csv(fileX, nrow = 10, header = FALSE, stringsAsFactors = FALSE)
     serial = strsplit(header[2, 1], " ")[[1]][3]
@@ -106,15 +106,14 @@ acc.sum.mp=function(accX, id, age, VldDay_cutoff=10, ...) {
     type=c("nonvalid", troiano$type)
     if (age<6) {age=6} # for children under 6, use age6 criteria for MVPA
     age_group=ifelse(age>=18, "adult", grep(age, names(troiano), value=TRUE))
-    accX$data$MVPA=ifelse(accX$data$nonvalid==1, type[1], as.character(cut(accX$data$y, c(troiano[,age_group], Inf), labels=type[2:5], right=FALSE)))
+    accX$data$MVPA=ifelse(accX$data$nonvalid==1, type[1], as.character(cut(accX$data$y, c(troiano[,age_group]/(60/accX$epoch), Inf), labels=type[2:5], right=FALSE)))
     accX$data$min=accX$epoch/60
     
     # function to calculate nonwear in mins
-    minlyview=function(x) {round(accX$epoch*sum(x)/60,3)}
-    duration=function(x) {difftime(max(x)+60, min(x), units = "min")} # add 1 min for the difference
+    duration=function(x) {difftime(max(x)+accX$epoch, min(x), units = "min")} # add 1 epoch for the difference
     details=aggregate(list(duration=accX$data$stamp), by=list(accX$data$date), duration)
     
-    specs=reshape(aggregate(accX$data$min, by=list(accX$data$date, accX$data$MVPA), minlyview), idvar="Group.1", timevar="Group.2", direction="wide")
+    specs=reshape(aggregate(accX$data$min, by=list(accX$data$date, accX$data$MVPA), sum), idvar="Group.1", timevar="Group.2", direction="wide")
     details=merge(details, specs, by="Group.1", all.x=TRUE, sort=FALSE)
     colnames(details)=gsub("x.", "",names(details))
     missing=type[!type %in% names(details)]
@@ -133,48 +132,48 @@ acc.sum.mp=function(accX, id, age, VldDay_cutoff=10, ...) {
 
 
 # the acc.sum function collapse the accelerometer data under REACH criteria of nonwear (consecutive 60 min 0 count with max 2 min allowance of counts < 100 in 1 min)
-acc.sum.reach=function(accX, id, age, VldDay_cutoff=10, ...) {
-    vert=ifelse(accX$data$y>0 & accX$data$y<100*accX$epoch/60, 1, accX$data$y) # change all interrupts to 1
-    chunk=data.frame(values=rle(vert)$values, lengths=rle(vert)$lengths) # cat consecutive 0 and interrupts
-    chunk$filtered=ifelse(chunk$values==1 & chunk$lengths<=120/accX$epoch, 0, chunk$values) # change <2 min interrupts to 0
-    rleX=rle(chunk$filtered) # extract smoothed movement
-    chunk$indicator=rep(seq_along(rleX$lengths), rleX$lengths) # assign new class to each move patterns
-    # compress consecutive zeros accounting for minor interrupt
-    compress=data.frame(values=rleX$values, aggregate(chunk$lengths, by=list(c(chunk$indicator)), FUN=sum, na.rm=TRUE))
-    compress$nonwear=ifelse(compress$values==0 & compress$x>=3600/accX$epoch, 1, 0) # defining nonwears
-    accX$data$nonwear=rep(compress$nonwear, compress$x) # assign nonwears
-    accX$data$date=as.Date(accX$data$stamp, tz="America/Los_Angeles")
-    # using troiano cut points for MVPA
-    type=c("nonwear", troiano$type)
-    age_group=ifelse(age>=18, "adult", grep(age, names(troiano), value=TRUE))
-    accX$data$MVPA=ifelse(accX$data$nonwear==1, type[1], as.character(cut(accX$data$y, c(troiano[,age_group], Inf), labels=type[2:5], right=FALSE)))
-    accX$data$min=accX$epoch/60
-    
-    # function to calculate nonwear in hrs
-    hrlyview=function(x) {round(accX$epoch*sum(x)/3600, 3)}
-    duration=function(x) {max(x)-min(x)}
-    details=aggregate(list(duration=accX$data$stamp), by=list(accX$data$date), duration)
-    
-    specs=reshape(aggregate(accX$data$min, by=list(accX$data$date, accX$data$MVPA), hrlyview), idvar="Group.1", timevar="Group.2", direction="wide")
-    details=merge(details, specs, by="Group.1", all.x=TRUE, sort=FALSE)
-    colnames(details)=gsub("x.", "",names(details))
-    missing=type[!type %in% names(details)]
-    if (length(missing>0)) details[missing]=NA
-    
-    details$VldHrs=details$duration-details$nonwear
-    details$VldDay=ifelse(details$VldHrs>=VldDay_cutoff, 1, 0)
-    names(details)[1]="Date"
-    
-    abstract=data.frame(SN=as.character(), ID=as.character(), Date=as.character(), TotDays=as.numeric(), VldDays=as.numeric(), stringsAsFactors = FALSE)
-    abstract[1,]=c(accX$serial, id, as.character(details$Date[1]), nrow(details), sum(details$VldDay))
-    return(list("abstract"=abstract, "details"=details[c("Date", "duration", "VldHrs", "VldDay", "nonwear", "light", "moderate", "sedentary", "vigorous")], "data"=accX$data))
-}
+# acc.sum.reach=function(accX, id, age, VldDay_cutoff=10, ...) {
+#     vert=ifelse(accX$data$y>0 & accX$data$y<100*accX$epoch/60, 1, accX$data$y) # change all interrupts to 1
+#     chunk=data.frame(values=rle(vert)$values, lengths=rle(vert)$lengths) # cat consecutive 0 and interrupts
+#     chunk$filtered=ifelse(chunk$values==1 & chunk$lengths<=120/accX$epoch, 0, chunk$values) # change <2 min interrupts to 0
+#     rleX=rle(chunk$filtered) # extract smoothed movement
+#     chunk$indicator=rep(seq_along(rleX$lengths), rleX$lengths) # assign new class to each move patterns
+#     # compress consecutive zeros accounting for minor interrupt
+#     compress=data.frame(values=rleX$values, aggregate(chunk$lengths, by=list(c(chunk$indicator)), FUN=sum, na.rm=TRUE))
+#     compress$nonwear=ifelse(compress$values==0 & compress$x>=3600/accX$epoch, 1, 0) # defining nonwears
+#     accX$data$nonwear=rep(compress$nonwear, compress$x) # assign nonwears
+#     accX$data$date=as.Date(accX$data$stamp, tz="America/Los_Angeles")
+#     # using troiano cut points for MVPA
+#     type=c("nonwear", troiano$type)
+#     age_group=ifelse(age>=18, "adult", grep(age, names(troiano), value=TRUE))
+#     accX$data$MVPA=ifelse(accX$data$nonwear==1, type[1], as.character(cut(accX$data$y, c(troiano[,age_group]/(60/accX$epoch), Inf), labels=type[2:5], right=FALSE)))
+#     accX$data$min=accX$epoch/60
+#     
+#     # function to calculate nonwear in hrs
+#     hrlyview=function(x) {round(accX$epoch*sum(x)/3600, 3)}
+#     duration=function(x) {max(x)-min(x)}
+#     details=aggregate(list(duration=accX$data$stamp), by=list(accX$data$date), duration)
+#     
+#     specs=reshape(aggregate(accX$data$min, by=list(accX$data$date, accX$data$MVPA), hrlyview), idvar="Group.1", timevar="Group.2", direction="wide")
+#     details=merge(details, specs, by="Group.1", all.x=TRUE, sort=FALSE)
+#     colnames(details)=gsub("x.", "",names(details))
+#     missing=type[!type %in% names(details)]
+#     if (length(missing>0)) details[missing]=NA
+#     
+#     details$VldHrs=details$duration-details$nonwear
+#     details$VldDay=ifelse(details$VldHrs>=VldDay_cutoff, 1, 0)
+#     names(details)[1]="Date"
+#     
+#     abstract=data.frame(SN=as.character(), ID=as.character(), Date=as.character(), TotDays=as.numeric(), VldDays=as.numeric(), stringsAsFactors = FALSE)
+#     abstract[1,]=c(accX$serial, id, as.character(details$Date[1]), nrow(details), sum(details$VldDay))
+#     return(list("abstract"=abstract, "details"=details[c("Date", "duration", "VldHrs", "VldDay", "nonvalid", "light", "moderate", "sedentary", "vigorous")], "data"=accX$data))
+# }
 
 # function to subset by time, and aggregate MVPA (template)
 acc.mvpa = function(accX, start, end) {
-    skeleton = data.frame(MVPA = c("light", "moderate", "nonwear", "sedentary", "vigorous"))
-    accX.seq = accX$data[accX$data$stamp > start & accX$data$stamp <= end, ]
-    mvpa = aggregate(min ~ MVPA, data = accX.seq, sum, na.rm = TRUE)
+    skeleton = data.frame(MVPA = c("light", "moderate", "nonvalid", "sedentary", "vigorous"))
+    accX.seg = accX$data[accX$data$stamp > start & accX$data$stamp <= end, ]
+    mvpa = aggregate(min ~ MVPA, data = accX.seg, sum, na.rm = TRUE)
     result = merge(skeleton, mvpa, by = "MVPA", all.x = TRUE, sort = FALSE)
     result[is.na(result)] = 0
     return(result)

@@ -21,7 +21,11 @@ ema.survey=function(survey) {
     # check the length of start and end survey
     if (length(startSurvey)!=length(endSurvey)) {
         assign("EMAwarningX", paste0("Warning: ", survey, " startSurvey != endSurvey"), envir = .GlobalEnv)
-        endSurvey=c(startSurvey[2:length(startSurvey)]-1, nrow(emaX$surveys))
+        if (length(startSurvey)>=2) {
+            endSurvey=c(startSurvey[2:length(startSurvey)]-1, nrow(emaX$surveys))
+        } else {
+            endSurvey=nrow(emaX$surveys)
+        }
     }
 
     # unify output variable name

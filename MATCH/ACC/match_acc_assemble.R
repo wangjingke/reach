@@ -1,11 +1,11 @@
 # this script process raw csv results from accelerometers and prepare for merging with EMA
-setwd("C:/Users/wangjink/Documents/REACH/MATCH/ACC")
+setwd("D:/REACH/MATCH/ACC")
 
 # reading in functions for ACC processing
-source("C:/Users/wangjink/Documents/Bitbucket/reach/common/functions_acc_process.R")
+source("D:/GitHub/reach/common/functions_acc_process.R")
 
 # reading in demographics data for age
-person=read.csv("C:/Users/wangjink/Documents/Bitbucket/reach/MATCH/ACC/madres_child_dob.csv", header = TRUE, stringsAsFactors = FALSE)
+person=read.csv("D:/GitHub/reach/MATCH/ACC/madres_child_dob.csv", header = TRUE, stringsAsFactors = FALSE)
 person$DOB=paste(person$DOB.Y, person$DOB.M, person$DOB.D, sep = "-")
 person$birthday=strptime(person$DOB, format="%Y-%m-%d", tz = "America/Los_Angeles")
 

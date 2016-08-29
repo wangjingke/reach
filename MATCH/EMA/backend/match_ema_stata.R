@@ -1,6 +1,6 @@
 # function to generate STATA script to label all variables
 ema.stata = function(script) {
-    source("C:/Users/wangjink/Documents/GitHub/reach/MATCH/EMA/backend/match_ema_keys.R")
+    source("D:/GitHub/reach/MATCH/EMA/backend/match_ema_keys.R")
     recode = 'mvdecode _all, mv(99999=. ) \n ds, has(type string) \n quietly foreach var in `r(varlist)\' { \n replace `var\' = "" if `var\' =="99999" \n}' # recode 99999 to missing in STATA
     # EMA
     emaMother=data.frame(variable=paste0("MOTHER_", keys.mother$variable), label=paste0(keys.mother$short, ifelse(is.na(keys.mother$choices), "", paste0("; ", keys.mother$choices))), stringsAsFactors = FALSE)
