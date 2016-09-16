@@ -35,15 +35,15 @@
 ema.anchor.parallel=function(emaSeg, ema, node, checkpoint) {
     t0=Sys.time()
     # variable list to do anchor
-    varList=grep("MOTHER|CHILD|VALID|NONVALID|SED|LIGHT|MOD|VIG|MVPA|COMPLY|COMPLETE", names(emaSeg), value = TRUE)
-    anchor=c("1P1", "1P2", "1M1", "1M2", "0C", "0P1", "0P2", "0M1", "0M2")
+    varList=grep("MOTHER|CHILD|valid|nonvalid|sed|light|mod|vig|mvpa|comply|complete", names(emaSeg), value = TRUE)
+    anchor=c("1p1", "1p2", "1m1", "1m2", "0c", "0p1", "0p2", "0m1", "0m2")
     extra=data.frame(matrix(NA, nrow=nrow(emaSeg), ncol=length(varList)*length(anchor), dimnames = list(c(), c(outer(varList, anchor, paste, sep="_")))))
     emaSeg=cbind(emaSeg, extra)
 
     for (i in 1:nrow(emaSeg)) {
-        id=emaSeg$SubjectID[i]
-        day=emaSeg$DayInStudy[i]
-        win=as.numeric(emaSeg$win_seq[i])
+        id=emaSeg$subjectID[i]
+        day=emaSeg$dayInStudy[i]
+        win=as.numeric(emaSeg$winSeq[i])
         for(j in 1:length(varList)) {
             for(k in 1:length(anchor)) {
                 object=substring(anchor[k], 1, 1)
@@ -51,9 +51,9 @@ ema.anchor.parallel=function(emaSeg, ema, node, checkpoint) {
                 distance=as.numeric(substring(anchor[k], 3, 3))
 
                 idX=switch(object, "1"=id, "0"=ifelse(id>=12000, as.numeric(id)-1000, as.numeric(id)+1000))
-                winX=switch(direction, "P"=win+distance, "M"=win-distance, "C"=win)
+                winX=switch(direction, "p"=win+distance, "m"=win-distance, "c"=win)
 
-                pos=which(ema$SubjectID==idX & ema$DayInStudy==day & ema$win_seq==winX)
+                pos=which(ema$subjectID==idX & ema$dayInStudy==day & ema$winSeq==winX)
                 if (length(pos)>0) {
                     emaSeg[i, paste0(varList[j], "_", anchor[k])]=ema[pos, varList[j]]
                 }

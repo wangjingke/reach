@@ -56,30 +56,30 @@ ema.indivPromptList = function (idX, enterDateX) {
         if (i==0) {winX=winX[winX %in% c("7-8pm", "9-9:30pm")]}
         if (i==7) {winX=winX[winX %in% c("7-8am", "9-10am", "11am-12pm", "1-2pm", "3-4pm")]}
         promptListX=data.frame(
-            SubjectID=idX,
+            subjectID=idX,
             mother=mother,
-            Date=currentDate,
-            DayInStudy=i+1,
+            date=currentDate,
+            dayInStudy=i+1,
             weekday=weekday,
             weekend=weekend,
             window=winX,
-            window_start=strptime(paste0(currentDate, " ", win["start",][sapply(winX, grep, win["names",])]), format = "%Y-%m-%d %H:%M:%S", tz = "America/Los_Angeles"),
-            window_end=strptime(paste0(currentDate, " ", win["end",][sapply(winX, grep, win["names",])]), format = "%Y-%m-%d %H:%M:%S", tz = "America/Los_Angeles"),
-            win_seq=win["winSeq",][sapply(winX, grep, win["names",])],
-            COMPLY=NA_integer_,
-            COMPLETE=NA_integer_,
-            prompt_start=NA,
-            prompt_end=NA,
+            windowStart=strptime(paste0(currentDate, " ", win["start",][sapply(winX, grep, win["names",])]), format = "%Y-%m-%d %H:%M:%S", tz = "America/Los_Angeles"),
+            windowEnd=strptime(paste0(currentDate, " ", win["end",][sapply(winX, grep, win["names",])]), format = "%Y-%m-%d %H:%M:%S", tz = "America/Los_Angeles"),
+            winSeq=win["winSeq",][sapply(winX, grep, win["names",])],
+            comply=NA_integer_,
+            complete=NA_integer_,
+            promptStart=NA,
+            promptEnd=NA,
             reprompt=NA_integer_,
-            BEDTIME=NA_character_,
-            TMRWAKETIME=NA_character_,
+            bedtime=NA_character_,
+            tmrwaketime=NA_character_,
             file=NA_character_,
-            TOD=NA,
+            tod=NA,
             stringsAsFactors = FALSE)
         promptListX[c(paste0("MOTHER_", keys.mother$variable), paste0("CHILD_", keys.child$variable))]=NA
         promptList=rbind(promptList, promptListX)
     }
-    promptList$TOD=factor(sapply(promptList$window, tod), levels = c(1:3), labels = c("Morning", "Afternoon", "Evening"))
+    promptList$tod=sapply(promptList$window, tod)
     return(promptList)
 }
 

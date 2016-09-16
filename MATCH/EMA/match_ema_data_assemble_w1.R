@@ -1,4 +1,4 @@
-setwd("D:/REACH/MATCH/Dataset/MATCH_EMA/Wave1/Beta20160829")
+setwd("D:/REACH/MATCH/Dataset/MATCH_EMA/Wave1/Beta20160907")
 # loading functions
 source("D:/GitHub/reach/MATCH/EMA/backend/match_ema_functions.R")
 # construct EMA skeletons
@@ -25,13 +25,11 @@ sapply(W1EMA[c(22:119, 122:156)], table)
 
 # change TMRWAKETIME to today's WAKETIME
 W1EMA=ema.waketime(W1EMA)
-# change some variables to factors
-W1EMA=ema.factor(W1EMA)
 
 # integrating ACC data
 W1EMA=ema.attachACC(W1EMA)
-W1EMA=ema.attachACC(W1EMA, prefix = "O")
-W1EMA=ema.ACC(ema=W1EMA, missing_output=paste0("MATCH_EMA_ACC_Missing_", Sys.Date(), ".csv"), accDir = "D:/REACH/MATCH/ACC", accList="MATCH_ACC_List_2016-08-29.csv")
+W1EMA=ema.attachACC(W1EMA, prefix = "o")
+W1EMA=ema.ACC(ema=W1EMA, missing_output=paste0("MATCH_EMA_ACC_Missing_", Sys.Date(), ".csv"), accDir = "D:/REACH/MATCH/ACC", accList="MATCH_ACC_List_2016-09-07.csv")
 
 # save the unanchored set
 saveRDS(W1EMA, paste0("MATCH_EMA_W1_preanchored_", Sys.Date(), ".rds"))
@@ -54,19 +52,20 @@ stopCluster(cl)
 saveRDS(W1EMA_anchored, paste0("MATCH_EMA_W1_anchored_", Sys.Date(), ".rds"))
 
 # adding daily average physical activity
-matchW1=ema.dailyPA(W1EMA_anchored, AccSummary="D:/REACH/MATCH/ACC/MATCH_ACC_Summary_2016-08-29.txt")
+matchW1 = ema.dailyPA(W1EMA_anchored, AccSummary="D:/REACH/MATCH/ACC/MATCH_ACC_Summary_2016-09-07.txt")
+# cleaning up
+matchW1 = ema.cleanup(matchW1, wave = 1)
 saveRDS(matchW1, paste0("MATCH_EMA_W1_", Sys.Date(), ".rds"))
+
+# save workplace for transformation to STATA
+matchW1raw=readRDS(paste0("MATCH_EMA_W1_", Sys.Date(), ".rds"))
+# change some variables to factors
+matchW1clean = ema.factor(matchW1raw)
+
+matchW1clean = matchW1clean[!is.na(matchW1clean$comply),]
+matchW1clean[is.na(matchW1clean)]=99999
+
+save(list=c("matchW1clean"), file=paste0("MATCH_EMA_W1_", Sys.Date(),".RData"))
 
 # create STATA script to label variables
 ema.stata(paste0("MATCH_EMA_W1_", Sys.Date(), ".do"))
-
-# save workplace for transformation to STATA
-matchW1=readRDS(paste0("MATCH_EMA_W1_", Sys.Date(), ".rds"))
-matchW1clean = matchW1[!is.na(matchW1$COMPLY),]
-matchW1clean[is.na(matchW1clean)]=99999
-# get rid of anchored OMVPA variables
-for (i in grep("^(OMVPA|OSED|OLIGHT|OMOD|OVIG|OVALID|ONONVALID).*_(1P1|1P2|1M1|1M2|0C|0P1|0P2|0M1|0M2)$", names(matchW1), value = TRUE)) {
-    matchW1clean[,i]=NULL
-}
-save(list=c("matchW1clean"), file=paste0("MATCH_EMA_W1_", Sys.Date(),".RData"))
-

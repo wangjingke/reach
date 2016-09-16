@@ -42,14 +42,14 @@ for (i in 1:length(accList)) {
 
 # archive ACC
 accArchive = data.frame(file = list.files(pattern = "^.*_mp.rds$"), stringsAsFactors = FALSE)
-accArchive$SubjectID = sapply(strsplit(accArchive$file, "_"), "[[", 2)
+accArchive$subjectID = sapply(strsplit(accArchive$file, "_"), "[[", 2)
 accArchive$date = sapply(strsplit(accArchive$file, "_"), "[[", 3)
 write.csv(accArchive, paste0("MATCH_ACC_List_", Sys.Date(),".csv"), row.names = FALSE, quote = FALSE)
 
 # summarize all the ACC
 for (i in 1:nrow(accArchive)) {
     accX = readRDS(accArchive$file[i])$details
-    accX$SubjectID = accArchive$SubjectID[i]
+    accX$subjectID = accArchive$subjectID[i]
     write.table(accX, paste0("MATCH_ACC_Summary_", Sys.Date(), ".txt"), sep = "\t", append = TRUE, quote = FALSE, row.names = FALSE, col.names = {if(i==1) TRUE else FALSE})
     if (i%%10==0) {print(paste0(i, "; ", round(i/nrow(accArchive)*100, 2), "%"))}
 }

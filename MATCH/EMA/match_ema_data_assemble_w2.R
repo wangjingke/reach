@@ -1,4 +1,4 @@
-setwd("D:/REACH/MATCH/Dataset/MATCH_EMA/Wave2/Beta20160829")
+setwd("D:/REACH/MATCH/Dataset/MATCH_EMA/Wave2/Beta20160907")
 # loading functions
 source("D:/GitHub/reach/MATCH/EMA/backend/match_ema_functions.R")
 # construct EMA skeletons
@@ -22,19 +22,15 @@ saveRDS(compliance, paste0("MATCH_W2_EMA_Compliance_", Sys.Date(), ".rds"))
 # 11185/12185 dropped out
 # deleting prompts with obviously wrong answers (multiple answers for binary variables)
 sapply(W2EMA[c(22:119, 122:156)], table)
-W2EMA[W2EMA$CHILD_MANAGE %in% c(2,3) & !is.na(W2EMA$CHILD_MANAGE), c("CHILD_PLANNED", "CHILD_MANAGE")]=NA
-W2EMA[W2EMA$CHILD_STRESS==7 & !is.na(W2EMA$CHILD_STRESS), c("CHILD_STRESS")]=NA
-W2EMA[W2EMA$CHILD_SAD==6 & !is.na(W2EMA$CHILD_SAD), c("CHILD_SAD")]=NA
+W2EMA[W2EMA$CHILD_Sad==6 & !is.na(W2EMA$CHILD_Sad), c("CHILD_Sad")]=NA
 
 # change TMRWAKETIME to today's WAKETIME
 W2EMA=ema.waketime(W2EMA)
-# change some variables to factors
-W2EMA=ema.factor(W2EMA)
 
 # integrating ACC data
 W2EMA=ema.attachACC(W2EMA)
-W2EMA=ema.attachACC(W2EMA, prefix = "O")
-W2EMA=ema.ACC(ema=W2EMA, missing_output=paste0("MATCH_EMA_ACC_Missing_", Sys.Date(), ".csv"), accDir = "D:/REACH/MATCH/ACC", accList="MATCH_ACC_List_2016-08-29.csv")
+W2EMA=ema.attachACC(W2EMA, prefix = "o")
+W2EMA=ema.ACC(ema=W2EMA, missing_output=paste0("MATCH_EMA_ACC_Missing_", Sys.Date(), ".csv"), accDir = "D:/REACH/MATCH/ACC", accList="MATCH_ACC_List_2016-09-07.csv")
 
 # save the unanchored set
 saveRDS(W2EMA, paste0("MATCH_EMA_W2_preanchored_", Sys.Date(), ".rds"))
@@ -57,19 +53,20 @@ stopCluster(cl)
 saveRDS(W2EMA_anchored, paste0("MATCH_EMA_W2_anchored_", Sys.Date(), ".rds"))
 
 # adding daily average physical activity
-matchW2=ema.dailyPA(W2EMA_anchored, AccSummary="D:/REACH/MATCH/ACC/MATCH_ACC_Summary_2016-08-29.txt")
+matchW2 = ema.dailyPA(W2EMA_anchored, AccSummary="D:/REACH/MATCH/ACC/MATCH_ACC_Summary_2016-09-07.txt")
+# cleaning up
+matchW2 = ema.cleanup(matchW2, wave = 2)
 saveRDS(matchW2, paste0("MATCH_EMA_W2_", Sys.Date(), ".rds"))
 
-# create STATA script to label variables
-ema.stata(paste0("MATCH_EMA_W2_", Sys.Date(), ".do"))
-
 # save workplace for transformation to STATA
-matchW2=readRDS(paste0("MATCH_EMA_W2_", Sys.Date(), ".rds"))
-matchW2clean = matchW2[!is.na(matchW2$COMPLY),]
+matchW2raw=readRDS(paste0("MATCH_EMA_W2_", Sys.Date(), ".rds"))
+# change some variables to factors
+matchW2clean = ema.factor(matchW2raw)
+
+matchW2clean = matchW2clean[!is.na(matchW2clean$comply),]
 matchW2clean[is.na(matchW2clean)]=99999
-# get rid of anchored OMVPA variables
-for (i in grep("^(OMVPA|OSED|OLIGHT|OMOD|OVIG|OVALID|ONONVALID).*_(1P1|1P2|1M1|1M2|0C|0P1|0P2|0M1|0M2)$", names(matchW2), value = TRUE)) {
-    matchW2clean[,i]=NULL
-}
+
 save(list=c("matchW2clean"), file=paste0("MATCH_EMA_W2_", Sys.Date(),".RData"))
     
+# create STATA script to label variables
+ema.stata(paste0("MATCH_EMA_W2_", Sys.Date(), ".do"))

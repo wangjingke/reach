@@ -99,7 +99,7 @@ ema$Form_start_time=sapply(ema$Form_start_time, timeSplit)
 ema$Form_finish_time=sapply(ema$Form_finish_time, timeSplit)
 
 # convert variables to factors
-keys=read.csv("C:/Users/wangjink/Documents/Bitbucket/reach/MADRES/pilot/madres_ema_keys.csv", header = TRUE, stringsAsFactors = FALSE)
+keys=read.csv("D:/GitHub/reach/MADRES/pilot/madres_pilot_ema_keys.csv", header = TRUE, stringsAsFactors = FALSE)
 for (i in 1:nrow(keys)) {
     # change to factor first
     if (keys[i, "Scale"]!="") {
@@ -123,12 +123,29 @@ ema$cortisol_wake30=NULL
 ema$cortisol_afternoon=NULL
 ema$cortisol_bedtime=NULL
 
+#### EMA compliance ####
+compliance = ema[,c("N_id", "Missing")]
+compliance$Missing = ifelse(is.na(compliance$Missing) | compliance$Missing=="", "done", compliance$Missing)
+compRate = table(compliance$N_id, compliance$Missing, useNA = "ifany")
+write.table(compRate, "clipboard", row.names = TRUE, col.names = TRUE, sep = "\t")
+
 # adding the ACC data
 acc_dir="../Accelerometer Data"
 # scan for ACC files, search csv files containing the accelerometer data ending with "sec.csv"
-acc.list=list.files(path=acc_dir, pattern="^.*EMAP\\.csv$", all.files=TRUE, include.dirs = FALSE, recursive = TRUE, full.names = FALSE)
+acc.list=list.files(path=acc_dir, pattern="^.*(EMAP|sec)\\.csv$", all.files=TRUE, include.dirs = FALSE, recursive = TRUE, full.names = FALSE)
 # loading functions for processing ACC files
-source("C:/Users/wangjink/Documents/Bitbucket/reach/common/functions_acc_process.R")
+source("D:/GitHub/reach/common/functions_acc_process.R")
+
+#### accelerometer compliance ####
+accSummary=c()
+accBrief=c()
+for (i in 1:length(acc.list)) {
+    accX = acc.sum.mp(acc.read(paste0("X:/Maternal and Child Health Study/Pilot/Jing/Accelerometer Data/", acc.list[i])), id=substr(acc.list[i], 1, 5), age=18)
+    accSummary = rbind(accSummary, cbind(subjectID = accX$abstract$ID, accX$details))
+    accBrief = rbind(accBrief, accX$abstract)
+}
+write.table(accSummary, "clipboard", row.names = FALSE, sep = "\t")
+write.table(accBrief, "clipboard", row.names = FALSE, sep = "\t")
 
 # acc measurements
 acc_point=c(outer(outer(c("valid", "nonvalid", "sed", "light", "mod", "vig", "mvpa"), c("_15", "_30", "_60", "_120"), paste0), c("_before", "_after"), paste0))
@@ -182,7 +199,7 @@ for (k in c(15, 30, 60, 120)) {
 
 
 # output data for StatTransfer
-save(ema, list="ema", file = "madres_pilot_ema_20160401.RData")
+save(ema, list="ema", file = "madres_pilot_ema_20160831.RData")
 
 # creating STATA script for labeling variables
 StataLabel=file("madres_pilot_ema_20160401.do", "w")

@@ -1,10 +1,10 @@
 # function to add file and reason
 ema.diagnosis = function(ema, emaDir, emaList) {
     ema$reason = NA_character_
-    jobList = unique(ema[c("SubjectID", "Date")])
+    jobList = unique(ema[c("subjectID", "date")])
     emaList = read.csv(paste0(emaDir, "/", emaList), header = TRUE, stringsAsFactors = FALSE)
     for (i in 1:nrow(jobList)) {
-        candidates=emaList[intersect(grep(jobList$Date[i], emaList$date), grep(jobList$SubjectID[i], emaList$subjectID)),]
+        candidates=emaList[intersect(grep(jobList$date[i], emaList$date), grep(jobList$subjectID[i], emaList$subjectID)),]
         if (any(candidates$correctFolder)) {
             survey=head(candidates$file[candidates$correctFolder==TRUE], n=1)
         } else {
@@ -17,12 +17,12 @@ ema.diagnosis = function(ema, emaDir, emaList) {
                 if (nrow(reasonX)>0) {
                     reasonX$timestamp = strptime(reasonX$TimeStampPrompted, format = "%Y-%m-%d %H:%M:%S", tz = "America/Los_Angeles")
                     for (j in 1:nrow(reasonX)) {
-                        ema[which(ema$SubjectID==jobList$SubjectID[i] & ema$window_start<=reasonX$timestamp[j] & reasonX$timestamp[j]<=ema$window_end), "reason"] = reasonX$Reason[j]
+                        ema[which(ema$subjectID==jobList$subjectID[i] & ema$window_start<=reasonX$timestamp[j] & reasonX$timestamp[j]<=ema$window_end), "reason"] = reasonX$Reason[j]
                     }
                     rm(reasonX)
                 }
             }
-            ema[which(ema$SubjectID==jobList$SubjectID[i] & ema$Date==jobList$Date[i]), "file"] = survey
+            ema[which(ema$subjectID==jobList$subjectID[i] & ema$date==jobList$date[i]), "file"] = survey
             rm(survey)
         }
         if (i%%100==0) {print(paste0(i, "; ", round(i/nrow(jobList)*100, 2), "%"))}
@@ -81,11 +81,11 @@ ema.inWakeWindow = function(ema, emaDir, emaList) {
     emaList = read.csv(paste0(emaDir, "/", emaList), header = TRUE, stringsAsFactors = FALSE)
     ema$inWakeWindow = NA
     for (i in 1:nrow(ema)) {
-        pos = which(emaList$subjectID == ema$SubjectID[i] & emaList$date == as.character(as.Date(ema$Date[i], format = "%Y-%m-%d", tz="America/Los_Angeles")-1))
+        pos = which(emaList$subjectID == ema$subjectID[i] & emaList$date == as.character(as.Date(ema$date[i], format = "%Y-%m-%d", tz="America/Los_Angeles")-1))
         if (length(pos)==1) {
             emaX = readRDS(paste0(emaDir, "/", emaList$file[pos]))
             if (length(emaX$bedwake)>1) {
-                wakeX = strptime(paste0(ema$Date[i], " ", emaX$bedwake$Waketime_Tomorrow[1]), format = "%Y-%m-%d %H:%M", tz = "America/Los_Angeles")
+                wakeX = strptime(paste0(ema$date[i], " ", emaX$bedwake$Waketime_Tomorrow[1]), format = "%Y-%m-%d %H:%M", tz = "America/Los_Angeles")
                 ema$inWakeWindow[i] = ifelse(wakeX>ema$window_end[i], "out", "in")
             }
         }
@@ -97,7 +97,7 @@ ema.inWakeWindow = function(ema, emaDir, emaList) {
 ema.causeOfMiss = function(ema) {
     ema$causeOfMiss = NA
     for (i in 1:nrow(ema)) {
-        if ((!is.na(ema$primary[i]) & ema$primary[i]=="outDate") | ema$DayInStudy[i]==1 | ema$DayInStudy[i]==8) {
+        if ((!is.na(ema$primary[i]) & ema$primary[i]=="outDate") | ema$dayInStudy[i]==1 | ema$dayInStudy[i]==8) {
             ema$causeOfMiss[i] = "outStudyWindow"
         } else if ((!is.na(ema$primary[i]) & ema$primary[i]=="outSleep") | (!is.na(ema$inWakeWindow[i]) & ema$inWakeWindow[i]=="out")) {
             ema$causeOfMiss[i] = "outSleepWindow"

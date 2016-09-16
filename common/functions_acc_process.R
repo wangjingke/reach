@@ -124,10 +124,10 @@ acc.sum.mp=function(accX, id, age, VldDay_cutoff=10, ...) {
     
     details$VldHrs=details$valid/60
     details$VldDay=ifelse(details$VldHrs>=VldDay_cutoff, 1, 0)
-    names(details)[1]="Date"
+    names(details)[1]="date"
     abstract=data.frame(SN=as.character(), ID=as.character(), Date=as.character(), TotDays=as.numeric(), VldDays=as.numeric(), stringsAsFactors = FALSE)
-    abstract[1,]=c(accX$serial, id, as.character(details$Date[1]), nrow(details), sum(details$VldDay))
-    return(list("abstract"=abstract, "details"=details[c("Date", "VldDay", "VldHrs", "duration", "nonvalid", "valid", "sedentary", "light", "moderate", "vigorous", "mvpa")], "data"=accX$data))
+    abstract[1,]=c(accX$serial, id, as.character(details$date[1]), nrow(details), sum(details$VldDay))
+    return(list("abstract"=abstract, "details"=details[c("date", "VldDay", "VldHrs", "duration", "nonvalid", "valid", "sedentary", "light", "moderate", "vigorous", "mvpa")], "data"=accX$data))
 }
 
 
