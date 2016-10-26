@@ -31,7 +31,7 @@ for (i in 1:length(dupID)) {
 log$cortisol = NA
 for (i in 1:nrow(log)) {
     if (!log$subjectID[i] %in% c("N0236", "N0237")) {
-        log$cortisol[i] = unique(results$Cortisol.nmol.l[results$Barcode.ID==log$barcode[i] & results$sample.no<191 & !results$Col1%in%c("N0236", "N0237")])
+        log$cortisol[i] = unique(results$Cortisol.nmol.l[results$Col1==log$subjectID[i] & results$Barcode.ID==log$barcode[i] & as.numeric(results$sample.no)<=191 & !is.na(results$Col1)])
     } else {
         log$cortisol[i] = results$Cortisol.nmol.l[results$sample.no==log$numID[i]]
     }
@@ -50,8 +50,6 @@ splitTime = function(timepoint) {
     }
 }
 
-test = log[log$subjectID=="N0191",]
-
 salivaPlot = function(data, id) {
     days = unique(data$date)
     minTime = min(data$timeTaken, na.rm = TRUE)  - 0.5
@@ -66,15 +64,12 @@ salivaPlot = function(data, id) {
     }
 }
 
-salivaPlot(test, "N0191")
 
-subjectList = unique(log$subjectID)
+subjectList = sort(unique(log$subjectID))
 for (i in 1:length(subjectList)) {
-    salivaPlot(log[log$subjectID==subjectList[i],], subjectList[i])
+    logX = log[log$subjectID==subjectList[i],]
+    salivaPlot(logX[order(logX$date, logX$timeTaken),], subjectList[i])
 }
-
-
-
 
 # interaction.plot(test$timeTaken, test$date, as.numeric(test$cortisol), col=c(1:4))
 
