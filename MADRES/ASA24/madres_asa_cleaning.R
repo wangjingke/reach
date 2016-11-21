@@ -30,9 +30,9 @@ total[order(total$id), c("id", basic)]
 # create variables for dietary recall
 
 # daily servings of fruit
-F_TOTAL
+# F_TOTAL
 # daily servings of vegetables
-V_TOTAL
+# V_TOTAL
 # daily servings of sugar sweetened beverages
 
 # daily added sugars
@@ -40,23 +40,23 @@ V_TOTAL
 # daily glycemic load
 
 # daily energy
-KCAL
+# KCAL
 # daily total SFA
-SFAT
+# SFAT
 # daily dietary fiber
-FIBE
+# FIBE
 # daily total fat
-TFAT
+# TFAT
 # daily total carbohydrate
-CARB
+# CARB
 # daily total protein
-PROT
+# PROT
 # daily total sugar
-SUGR
+# SUGR
 # daily total whole grains
-G_WHOLE
+# G_WHOLE
 
-varlist = c("F_TOTAL", "V_TOTAL", "KCAL", "SFAT", "FIBE", "TFAT", "CARB", "PROT", "SUGR", "G_WHOLE")
+varlist = c("F_TOTAL", "V_TOTAL", "KCAL", "VC", "SFAT", "FIBE", "TFAT", "CARB", "PROT", "SUGR", "G_WHOLE")
 
 batchAggregate = function(varlist, anchor, data) {
     output = data.frame(anchor=unique(data[anchor]))
@@ -75,6 +75,7 @@ for (i in ptVarlist) {
     dailyTotal[paste0(i, "_std")] = dailyTotal[i]/dailyTotal["KCAL"]*1000
 }
 
+dailyTotal
 
 
 
