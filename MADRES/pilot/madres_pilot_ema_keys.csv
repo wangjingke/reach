@@ -45,10 +45,13 @@ behavior_done_7,behavior_done_Soda,,"Since waking up this morning (Over the last
 behavior_done_8,behavior_done_NoneAbove,,"Since waking up this morning (Over the last 2 HOURS), which of these things have you done?",None of these things
 timeuse_done_1,timeuse_done_Errands,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Errands/shopping
 timeuse_done_2,timeuse_done_ChildAct,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Took children to lessons/classes/activites
-timeuse_done_3,timeuse_done_Housework,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Housework/chores/cooking
-timeuse_done_4,timeuse_done_Job,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Work for a job
-timeuse_done_5,timeuse_done_Infant,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Took care of an infant/toddler
-timeuse_done_6,timeuse_done_NoneAbove,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",None of these
+timeuse_done_3,timeuse_done_Cooking,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Cooking or heating food indoors
+timeuse_done_4,timeuse_done_Dusting,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Vacuuming/dusting
+timeuse_done_5,timeuse_done_Housework,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Housework/chores
+timeuse_done_6,timeuse_done_Job,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Work for a job
+timeuse_done_7,timeuse_done_Infant,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Took care of an infant/toddler
+timeuse_done_8,timeuse_done_Other,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",Other
+timeuse_done_9,timeuse_done_NoneAbove,,"Since waking up this morning (Over the last 2 HOURS), which have you done?",None of these
 physical_context,,scaleWhere,Where were you just before the phone went off?,
 social_context_1,social_context_Spouse,,Who were you with just before the phone went off?,Spouse or partner
 social_context_2,social_context_Children,,Who were you with just before the phone went off?,Your child(ren)
@@ -58,6 +61,10 @@ social_context_5,social_context_Coworkers,,Who were you with just before the pho
 social_context_6,social_context_OtherAcq,,Who were you with just before the phone went off?,Other types of acquaintances
 social_context_7,social_context_Unknown,,Who were you with just before the phone went off?,People you don't know 
 social_context_8,social_context_Alone,,Who were you with just before the phone went off?,I was alone
+micropem_exposure_1,micropem_exposure_DoorOn,,"If you were at home sometime over the past 2 HOURS, which of the following did you have?",Window(s) or door(s) were open
+micropem_exposure_2,micropem_exposure_AcOn,,"If you were at home sometime over the past 2 HOURS, which of the following did you have?",Air conditioning was turned on
+micropem_exposure_3,micropem_exposure_FanOn,,"If you were at home sometime over the past 2 HOURS, which of the following did you have?",Fan was turned on
+micropem_exposure_4,micropem_exposure_NotHome,,"If you were at home sometime over the past 2 HOURS, which of the following did you have?",I was not at home at all 
 safety,,scaleSafe,How safe do you feel where you are right now?,
 Pilot.ID,,,,
 Version,,,,

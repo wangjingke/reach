@@ -57,6 +57,14 @@ for (i in 1:length(ema.list)) {
     # drop morning questions
     questX=questX[,!names(questX) %in% am.q]
     questX$N_id=idX
+    # the answer to timeuse_done has changed from a scale of 6 to 9 in the last two, so use the new scale as standard, and convert the old ones to new
+    if (!idX %in% c("N0236", "N0237")) {
+        colnames(questX)[colnames(questX)=="timeuse_done_6"] = "timeuse_done_9"
+        colnames(questX)[colnames(questX)=="timeuse_done_5"] = "timeuse_done_7"
+        colnames(questX)[colnames(questX)=="timeuse_done_4"] = "timeuse_done_6"
+        colnames(questX)[colnames(questX)=="timeuse_done_3"] = "timeuse_done_5"
+    }
+
     ema=rbind.fill(ema, questX)
 }
 
@@ -99,15 +107,15 @@ ema$Form_start_time=sapply(ema$Form_start_time, timeSplit)
 ema$Form_finish_time=sapply(ema$Form_finish_time, timeSplit)
 
 # convert variables to factors
-keys=read.csv("D:/GitHub/reach/MADRES/pilot/madres_pilot_ema_keys.csv", header = TRUE, stringsAsFactors = FALSE)
+keys=readWorksheetFromFile("D:/GitHub/reach/MADRES/pilot/madres_pilot_ema_keys.xlsx", sheet = 1, header = TRUE)
 for (i in 1:nrow(keys)) {
     # change to factor first
-    if (keys[i, "Scale"]!="") {
+    if (!is.na(keys[i, "Scale"])) {
         scaleX=get(keys$Scale[i])
         ema[,keys$SurveyName[i]]=factor(ema[,keys$SurveyName[i]], levels=scaleX["level",], labels=scaleX["scale",])
     }
     # change variable name
-    if (keys[i, "EmaName"]!="") {
+    if (!is.na(keys[i, "EmaName"])) {
         colnames(ema)[colnames(ema)==keys$SurveyName[i]]=keys$EmaName[i]
     }
 }
@@ -197,16 +205,15 @@ for (k in c(15, 30, 60, 120)) {
     }
 }
 
-
 # output data for StatTransfer
-save(ema, list="ema", file = "madres_pilot_ema_20160831.RData")
+save(ema, list="ema", file = "madres_pilot_ema_20161122.RData")
 
 # creating STATA script for labeling variables
-StataLabel=file("madres_pilot_ema_20160401.do", "w")
+StataLabel=file("madres_pilot_ema_20161122.do", "w")
 for (i in 1:nrow(keys)) {
-    varnameX=ifelse(keys$EmaName[i]=="", keys$SurveyName[i], keys$EmaName[i])
-    if (keys$Label[i]!="") {
-        commandX=paste0('label variable ', varnameX, ' "', keys$Label[i], ' ', keys$SubLabel[i], '"')
+    varnameX=ifelse(is.na(keys$EmaName[i]), keys$SurveyName[i], keys$EmaName[i])
+    if (!is.na(keys$Label[i])) {
+        commandX=paste0('label variable ', varnameX, ' "', keys$Label[i], ' ', ifelse(is.na(keys$SubLabel[i]), "", keys$SubLabel[i]), '"')
         write(commandX, file=StataLabel, append = TRUE)
     }
 }
