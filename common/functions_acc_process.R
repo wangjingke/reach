@@ -105,7 +105,7 @@ acc.sum.mp=function(accX, id, age, VldDay_cutoff=10, ...) {
     # using troiano cut points for MVPA
     type=c("nonvalid", troiano$type)
     if (age<6) {age=6} # for children under 6, use age6 criteria for MVPA
-    age_group=ifelse(age>=18, "adult", grep(age, names(troiano), value=TRUE))
+    age_group=ifelse(age>=18, "adult", paste0('age', age))
     accX$data$MVPA=ifelse(accX$data$nonvalid==1, type[1], as.character(cut(accX$data$y, c(troiano[,age_group]/(60/accX$epoch), Inf), labels=type[2:5], right=FALSE)))
     accX$data$min=accX$epoch/60
     
