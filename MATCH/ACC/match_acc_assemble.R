@@ -5,7 +5,7 @@ setwd("D:/REACH/MATCH/ACC")
 source("D:/GitHub/reach/common/functions_acc_process.R")
 
 # reading in demographics data for age
-person=read.csv("D:/GitHub/reach/MATCH/ACC/madres_child_dob.csv", header = TRUE, stringsAsFactors = FALSE)
+person=read.csv("D:/GitHub/reach/MATCH/ACC/match_child_dob.csv", header = TRUE, stringsAsFactors = FALSE)
 person$DOB=paste(person$DOB.Y, person$DOB.M, person$DOB.D, sep = "-")
 person$birthday=strptime(person$DOB, format="%Y-%m-%d", tz = "America/Los_Angeles")
 
