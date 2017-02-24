@@ -2,7 +2,8 @@
 setwd("D:/REACH/MATCH/ACC")
 
 # reading in functions for ACC processing
-source("D:/GitHub/reach/common/functions_acc_process.R")
+source("D:/GitHub/ActigraphAccelerometer/actigraph/R/acc.read.R")
+source("D:/GitHub/ActigraphAccelerometer/actigraph/R/acc.summarize.R")
 
 # reading in demographics data for age
 person=read.csv("D:/GitHub/reach/MATCH/ACC/match_child_dob.csv", header = TRUE, stringsAsFactors = FALSE)
@@ -22,7 +23,7 @@ for (i in 1:length(accList)) {
     accX=try(acc.read(accList[i]), silent = FALSE)
     if (inherits(accX, "try-error")) {
         datatableX=paste0(strsplit(accList[i], "\\.csv")[[1]][1], "DataTable.csv")
-        accX=try(acc.read.DT(datatableX), silent = FALSE)
+        accX=try(acc.read(datatableX, DataTable = TRUE), silent = FALSE)
         if (inherits(accX, "try-error")) {next}
     } # using DataTable file if the raw csv is missing
     
@@ -34,8 +35,7 @@ for (i in 1:length(accList)) {
     }
     
     if (length(ageX)>0) {
-        saveRDS(acc.sum.mp(accX, id=idX, age=ageX), paste("MATCH", idX, surveyDate,"mp.rds", sep="_"))
-        # saveRDS(acc.sum.reach(accX, id=idX, age=ageX), paste("MATCH", idX, wX, "reach.rds", sep="_"))
+        saveRDS(acc.summarize(accX, id=idX, age=ageX), paste("MATCH", idX, surveyDate,"mp.rds", sep="_"))
     }
     if (i%%10==0) {print(paste0(i, "; ", round(i/length(accList)*100, 2), "%"))}
 }

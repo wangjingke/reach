@@ -1,12 +1,14 @@
 setwd("D:/REACH/MADRES/ASA/data")
 
-target = "X:/MADRES/ASA24 Diet Recall/Raw Data Files/2016 Version 093016"
+target <- "X:/MADRES/ASA24 Diet Recall/Raw Data Files/2016 Version 093016"
 
-total14 = read.csv("X:/MADRES/ASA24 Diet Recall/Raw Data Files/2014 Version - FINAL FILES/MAD1_61323_TNMYPHEI.csv", header = TRUE, stringsAsFactors = FALSE)
+total14 <- read.csv("X:/MADRES/ASA24 Diet Recall/Raw Data Files/2014 Version - FINAL FILES/MAD1_61323_TNMYPHEI.csv", header = TRUE, stringsAsFactors = FALSE)
 # change asa14 variable name to align with asa 16
-colnames(total14)[names(total14)=="G_WHL"] = "G_WHOLE"
+colnames(total14)[names(total14)=="G_WHL"] <- "G_WHOLE"
+colnames(total14)[names(total14)=="ADD_SUG"] <- "ADD_SUGARS"
 
-total16 = read.csv(paste0(target, "/MMAD1_8350_Totals.csv"), header = TRUE, stringsAsFactors = FALSE)
+total16.1 <- read.csv("X:/MADRES/ASA24 Diet Recall/Raw Data Files/2016 Version 093016/MMAD1_15670_Totals.csv", header = TRUE, stringsAsFactors = FALSE)
+total16.2 <- read.csv("X:/MADRES/ASA24 Diet Recall/Raw Data Files/2016 Version 093016/MAD2_15664_Totals.csv", header = TRUE, stringsAsFactors = FALSE)
 common = intersect(names(total14), names(total16))
 
 total =  rbind(total14[common], total16[common])
@@ -36,7 +38,7 @@ total[order(total$id), c("id", basic)]
 # daily servings of sugar sweetened beverages
 
 # daily added sugars
-
+# ADD_SUGARS
 # daily glycemic load
 
 # daily energy

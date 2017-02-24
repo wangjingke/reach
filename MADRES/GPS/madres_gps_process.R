@@ -1,8 +1,5 @@
 setwd("D:/Temp")
 
-test <- read.csv("X:/MADRES/Project 2/Data/GPS/processed/MadresGpsTracking_MAD3100_1478202324407_decoded.csv", 
-                 header = FALSE, stringsAsFactors = FALSE)
-
 ProcessGPS <- function(gpsX) {
   output.name <- c("subjectID", "string_time", "date", "time", "timestamp", 
                    "source", "latitude", "longitude", "accuracy", "altitude", "velocity", 
@@ -50,3 +47,7 @@ ProcessGPS <- function(gpsX) {
 
   return(output)
 }
+
+test <- read.csv("X:/MADRES/Project 2/Data/GPS/processed/MadresGpsTracking_MAD3100_1478202324407_decoded.csv", 
+                 header = FALSE, stringsAsFactors = FALSE, fileEncoding = "UTF-8-BOM")
+write.csv(ProcessGPS(test), "X:/MADRES/Project 2/Data/GPS/processed/MAD2163100_A_formated.csv", row.names = FALSE, quote = FALSE)
