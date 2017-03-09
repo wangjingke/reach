@@ -28,6 +28,12 @@ ema.aggregate = function(path, clean = FALSE) {
         surveys=c()
         for (i in 1:length(pos_sur)) {
             surveyX=read.csv(filelist[pos_sur[i]], header = FALSE, quote = '\"', encoding = "UTF-8", stringsAsFactors = FALSE, skipNul = TRUE, col.names = sprintf("V%d", 1:10))
+            # discard subjectID from the first column after format change
+            if (any(grepl("[0-9]{13}", surveyX$V2))) {
+                colnames(surveyX) <- c("V0", names(surveyX)[1:(ncol(surveyX)-1)])
+                surveyX$V0 <- NULL
+            }
+            
             surveyX=surveyX[grepl("[0-9]{13}", surveyX$V1), 2:6]
             surveyX$V6=ifelse(grepl("Selected", surveyX$V6), surveyX$V6, "")
             surveys=rbind.fill(surveys, surveyX)
@@ -42,6 +48,75 @@ ema.aggregate = function(path, clean = FALSE) {
 
     if (clean) {
         id=grep("[0-9]{5}", unlist(strsplit(path, "[^0-9]+")), value = TRUE)
+    } else {
+        id=unique(grep("[0-9]{5}", unlist(strsplit(as.character(c(prompts[1], responses_mother[1], responses_child[1])), "[^0-9]+")), value = TRUE))
+    }
+
+    if (length(id)>0) {
+        return(list(
+            "id"=id,
+            "prompts"=prompts,
+            "bedwake"=bedwake,
+            "saliva"=saliva,
+            "responses_mother"=responses_mother,
+            "responses_child"=responses_child,
+            "surveys"=if (exists("surveys")) surveys else NA,
+            "battery"=battery
+        ))
+    } else return(NA)
+}
+
+ema.aggregate.key <- function(path, clean = FALSE) {
+    # function to read files when non-empty, and return NA otherwise
+    wockets.read=function(target, header = TRUE) {
+        output=try(read.csv(target, header = header, stringsAsFactors = FALSE, skipNul = TRUE, encoding = "UTF-8"), silent = TRUE)
+        if (inherits(output, "try-error")) return(NA) else return(output)
+    }
+    
+    filelist=list.files(path, full.names = TRUE)
+
+    pos_prompt=grep("Prompts.csv", filelist)
+    prompts=wockets.read(filelist[pos_prompt])
+    
+    bedwake <- NA
+
+    pos_res_mother=grep("PromptResponses_Mother.csv", filelist)
+    responses_mother=wockets.read(filelist[pos_res_mother])
+
+    pos_res_child=grep("PromptResponses_Child.csv", filelist)
+    responses_child=wockets.read(filelist[pos_res_child])
+
+    pos_sali=grep("PromptResponses_Saliva.csv", filelist)
+    saliva=wockets.read(filelist[pos_sali])
+
+    pos_sur=grep("^.*Survey_KEY_EMA_.*\\.csv$", filelist)
+    if (length(pos_sur)>0) {
+        surveys=c()
+        for (i in pos_sur) {
+            surveyX=read.csv(filelist[i], header = FALSE, quote = '\"', encoding = "UTF-8", stringsAsFactors = FALSE, skipNul = TRUE, col.names = sprintf("V%d", 1:10))
+
+            surveyX=surveyX[grepl("[0-9]{13}", surveyX$V1), 2:6]
+            surveys=rbind.fill(surveys, surveyX)
+        }
+        surveys$time=strptime(sapply(strsplit(surveys$V2, " "), FUN = function(x){paste(head(x, 2), collapse = " ")}), format = "%Y-%m-%d %H:%M:%S", tz = "America/Los_Angeles")
+        surveys=surveys[order(surveys$time),]
+    }
+
+    # extract battery info
+    dateX <- substr(grep("[0-9]{4}-[0-9]{2}-[0-9]{2}", strsplit(path, "/")[[1]], value = TRUE), 1, 10)
+    battery.list <- list.files(paste0(strsplit(path, "surveys")[[1]][1], "logs/", dateX), "BatteryManager.log.csv", full.name = TRUE, recursive = TRUE)
+    
+    if (length(battery.list) > 0) {
+        battery <- c()
+        for (j in battery.list) {
+            battery <- rbind.fill(battery, wockets.read(target = j, header = FALSE))
+        }
+    } else {
+        battery <- NA
+    }
+
+    if (clean) {
+        id=unique(grep("[0-9]{5}", unlist(strsplit(path, "[^0-9]+")), value = TRUE))
     } else {
         id=unique(grep("[0-9]{5}", unlist(strsplit(as.character(c(prompts[1], responses_mother[1], responses_child[1])), "[^0-9]+")), value = TRUE))
     }

@@ -52,6 +52,7 @@ aggregate(subjectID ~ trimester, data = asa, length)
 # recalls per subject
 aggregate(UserName ~ subjectID, data = asa, length)
 aggregate(UserName ~ subjectID + trimester, data = asa, length)
+aggregate(trimester ~ subjectID, data = asa, unique)
 
 summary.table <- function(data, varlist) {
   require("plyr")
@@ -99,12 +100,18 @@ summary.acc <- function(data, var) {
   return(list(varName = var, mean = avg, sd = std, range = bound))
 }
 
-summary.acc(pilot.acc[pilot.acc$VldDay == 1,], "valid")
-summary.acc(pilot.acc[pilot.acc$VldDay == 1,], "sedentary")
-summary.acc(pilot.acc[pilot.acc$VldDay == 1,], "light")
-summary.acc(pilot.acc[pilot.acc$VldDay == 1,], "moderate")
-summary.acc(pilot.acc[pilot.acc$VldDay == 1,], "vigorous")
-summary.acc(pilot.acc[pilot.acc$VldDay == 1,], "mvpa")
+mvpa <- c("valid", "sedentary", "light", "moderate", "vigorous", "mvpa")
+for (i in mvpa) {
+    print(summary.acc(pilot.acc[pilot.acc$VldDay == 1 & !pilot.acc$subjectID %in% c(26, 31),], i))
+}
+
+for (i in mvpa) {
+    print(summary.acc(pilot.acc[pilot.acc$VldDay == 1 & pilot.acc$subjectID == 26 & pilot.acc$date > "2017-01-01",], i))
+}
+
+for (i in mvpa) {
+    print(summary.acc(pilot.acc[pilot.acc$VldDay == 1 & pilot.acc$subjectID %in% c(26, 31) & pilot.acc$date < "2017-01-01",], i))
+}
 
 ### cortisol ###
 library(XLConnect)
@@ -183,15 +190,17 @@ for (i in 1:nrow(slope)) {
   dayX <- log.190[log.190$subjectID == slope$subjectID[i] & log.190$date == slope$date[i] & !is.na(log.190$cortisol),]
   dayX.num <- max(dayX$day)
   dayX <- dayX[dayX$day == dayX.num,]
-  cortisol.high <- max(dayX$cortisol[dayX$seq %in% c(1, 2)], na.rm = TRUE)
-  cortisol.low <- min(dayX$cortisol[dayX$seq %in% c(3, 4)], na.rm = TRUE)
-  slopeX <- (dayX$cortisol[dayX$cortisol == cortisol.high] - cortisol.low)/(dayX$timeTaken[dayX$cortisol == cortisol.high] - dayX$timeTaken[dayX$cortisol == cortisol.low])
+  slopeX <- (dayX$cortisol[dayX$seq == 2] - dayX$cortisol[dayX$seq == 3])/(dayX$timeTaken[dayX$seq == 2] - dayX$timeTaken[dayX$seq == 3])
+
   aucX <- sum((dayX$cortisol[1:(nrow(dayX)-1)] + dayX$cortisol[2:(nrow(dayX))])*(dayX$timeTaken[2:(nrow(dayX))] - dayX$timeTaken[1:(nrow(dayX)-1)])*0.5) #- dayX$cortisol[1]*(max(dayX$timeTaken) - min(dayX$timeTaken))
-  slope$slope[i] <- slopeX
+  slope$slope[i] <- ifelse(length(slopeX) < 1, NA, slopeX)
   slope$auc[i] <- aucX
   
   awake <- max(dayX$timeTaken) - min(dayX$timeTaken)
 }
+
+mean(log$cortisol[log$seq == 1], na.rm = TRUE)
+sd(log$cortisol[log$seq == 1], na.rm = TRUE)
 
 mean(slope$slope[slope$slope <= 0], na.rm = TRUE)
 sd(slope$slope[slope$slope <= 0], na.rm = TRUE)
@@ -200,10 +209,29 @@ mean(slope$auc, na.rm = TRUE)
 sd(slope$auc, na.rm = TRUE)
 
 
+salivaPlot = function(data, id) {
+    days = unique(data$date)
+    minTime = min(data$timeTaken, na.rm = TRUE)  - 0.5
+    maxCor = max(data$cortisol, na.rm = TRUE) + 0.5
+    for (i in 1:length(days)) {
+        if (i==1) {
+            plot(data$timeTaken[data$date==days[i]], data$cortisol[data$date==days[i]], xlab = "Time", ylab = "nmol/l", xlim=c(minTime, 24), ylim=c(0, maxCor), col=i, type="l", main = id)
+        } else {
+            points(data$timeTaken[data$date==days[i]], data$cortisol[data$date==days[i]], col=i, type="l")
+        }
+        legend("topright", days, col = 1:i, bty = "n", lty = 1, cex = 0.8)
+    }
+}
 
 
+subjectList = sort(unique(log$subjectID))
+for (i in 1:length(subjectList)) {
+    logX = log[log$subjectID==subjectList[i],]
+    salivaPlot(logX[order(logX$date, logX$timeTaken),], subjectList[i])
+}
 
-
+# example plot
+write.csv(log[log$subjectID %in% c("N0191", "N0192", "N0227"),], "N192_saliva.csv", quote = FALSE, row.names = FALSE)
 
 
 
