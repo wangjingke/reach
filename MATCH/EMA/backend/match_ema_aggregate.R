@@ -44,7 +44,7 @@ ema.aggregate = function(path, clean = FALSE) {
     }
 
     # extract battery info
-    battery=wockets.read(target=paste0(gsub("survey", "logs", path), "/BluetoothSensorService.output.csv"), header = FALSE)
+    battery=wockets.read(target=paste0(gsub(".uploaded", "", gsub("survey|surveys", "logs", path)), "/BluetoothSensorService.output.csv"), header = FALSE)
 
     if (clean) {
         id=grep("[0-9]{5}", unlist(strsplit(path, "[^0-9]+")), value = TRUE)
