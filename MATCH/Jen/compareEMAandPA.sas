@@ -1,7 +1,10 @@
-libname match "D:\REACH\MATCH\Dataset\MATCH_EMA\Combined";
+libname match "D:\REACH\MATCH\Dataset\MATCH_EMA\Combined\V21";
 libname jen "Y:\Jing\Jen";
 
-data jen.emaPAcomparison20160831;
-set match.Match_ema_v20 (keep = subjectid wave weekend comply prompt_start prompt_end child_done_sports child_done_tv mvpa_120_before sed_120_before);
+data jen.emaPAcomparison20170315;
+set match.Match_ema_v21mini (keep = id wave weekend comply promptStart promptEnd cDone_sports cDone_tv valid_120_before nonvalid_120_before mvpa_120_before sed_120_before light_120_before);
 if wave = 1;
 run;
+
+
+ 

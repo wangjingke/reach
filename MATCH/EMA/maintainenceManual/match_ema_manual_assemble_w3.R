@@ -30,3 +30,7 @@ for (k in manual) {
 }
 
 write.csv(ema.archive(work_dir), paste0("MATCH_EMA_W3_List_manual_", Sys.Date(), ".csv"), row.names=FALSE, quote=FALSE)
+
+
+archive <- read.csv("MATCH_EMA_W3_List_manual_2017-03-10.csv", header = TRUE, stringsAsFactors = FALSE)
+archive[archive$correctFolder == FALSE,]
